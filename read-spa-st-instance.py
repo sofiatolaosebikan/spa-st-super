@@ -159,14 +159,14 @@ class RISPAT:
             self.lp[lecturer] = [int(entry[1]), lecturerpreferencelist, d, False, length, length - 1]
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
-#s = RISPAT()
-#s.read_file()
-#print(s.sp)
-#print()
-#print(s.sp_no_tie_deletions)
-#print(s.plc)
-#print()
-#print(s.lp)
+s = RISPAT()
+s.read_file()
+print(s.sp)
+print()
+print(s.sp_no_tie_deletions)
+print(s.plc)
+print()
+print(s.lp)
 
 
 
