@@ -1,9 +1,10 @@
 import sys
+import os
 from readinputSPAST import READSPAST
 from copy import deepcopy
 
 class SPATSUPER:
-    def __init__(self):
+    def __init__(self, input):
         """
         Command line input is as follows
         1 - name of the text file to read the instance
@@ -14,14 +15,13 @@ class SPATSUPER:
                 ::: tie-oddnumber.txt has no super-stable matching
                 ::: tie-evennumber.txt has a super-stable matching
         """
+        self.filename = input
         r = READSPAST()
-        self.filename = sys.argv[1]
         r.read_file(self.filename)
 
         self.students = r.students
         self.projects = r.projects
         self.lecturers = r.lecturers
-
 
         self.sp = r.sp
         self.sp_copy = r.sp_copy
@@ -407,66 +407,33 @@ class SPATSUPER:
 # -------------------------------------------------------------------------------------------------------------------------------
 #  -------------------- Writes the matching to a text file, the first line verifies that that the matching is stable / not :|
 # -------------------------------------------------------------------------------------------------------------------------------
-    def runAlgorithm(self):
+def runAlgorithm():
 
-        if __name__ == '__main__':
-            self.algorithm()
-            # -------------------------------------------------------------------------------------------------------------------------------
-            # ~~~~~~~ OUTPUT NO SUPER STABLE MATCHING EXISTS IF ANY OF THE CONDITIONS ABOVE IS TRUE ::: OTHERWISE OUTPUT THE MATCHING ~~~~~~~
-            # -------------------------------------------------------------------------------------------------------------------------------
+    if __name__ == '__main__':
+        directory = 'experiments/2a/'
+        output = directory+'output.txt'
+        with open(output, 'w') as O:
+            for i in range(0, 51):
+                for j in range(0, 51):
+                    input_file = directory + 'instance_' + str(i) + '_' + str(j) + '.txt'
+                    s = SPATSUPER(input_file)
+                    s.algorithm()
+                    # -------------------------------------------------------------------------------------------------------------------------------
+                    # ~~~~~~~ OUTPUT NO SUPER STABLE MATCHING EXISTS IF ANY OF THE CONDITIONS ABOVE IS TRUE ::: OTHERWISE OUTPUT THE MATCHING ~~~~~~~
+                    # -------------------------------------------------------------------------------------------------------------------------------
 
-            if self.multiple_assignment is True or self.lecturer_capacity_checker is True or self.project_capacity_checker is True:
-                #print(self.M)
-                #print('No super-stable matching exists! Final assignment relation is .. ')
-                with open('matching.txt', 'w') as O:
-                    O.write('No super-stable matching exists! Final assignment relation is .. ' + ' \n')
-                    l = len(self.M)
-                    for i in range(1, l+1):
-                        if len(self.M['s'+str(i)]) == 0:
-                            O.write(str(i)+'\n')
-                        else:
-                            O.write(str(i) + ' ')
-                            matched_project = list(self.M['s' + str(i)])
-                            sliced = [p[1:] for p in matched_project]
-                            O.writelines('%s ' % i for i in sliced)
-                            O.write('\n')
-                    O.close()
+                    if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
+                        O.write('instance_' + str(i) + '_' + str(j) + ': No super-stable matching exists' + ' \n')
 
-            else:
-                if self.blockingpair is True:
-                    #print('Reason is UNKNOWN!!!')
-                    #print('No super-stable matching exists! Final assignment relation is .. ')
-                    with open('matching.txt', 'w') as O:
-                        O.write('Reason is UNKNOWN!!! No super-stable matching exists! Final assignment relation is .. ' + ' \n')
-                        l = len(self.M)
-                        for i in range(1, l + 1):
-                            if len(self.M['s' + str(i)]) == 0:
-                                O.write(str(i) + '\n')
-                            else:
-                                O.write(str(i) + ' ')
-                                matched_project = list(self.M['s' + str(i)])
-                                sliced = [p[1:] for p in matched_project]
-                                O.writelines('%s ' % i for i in sliced)
-                                O.write('\n')
-                        O.close()
+                    else:
+                        if s.blockingpair is True:
+                            O.write('instance_' + str(i) + '_' + str(j) + ': No super-stable matching exists.. REASON IS UNKNOWN..' + ' \n')
 
-            if self.multiple_assignment is False and self.lecturer_capacity_checker is False and self.project_capacity_checker is False and self.blockingpair is False:
+                    if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
+                        O.write('instance_' + str(i) + '_' + str(j) + ': Has a super-stable matching' + ' \n')
 
-                #print('Matching is Super-Stable')
-                with open('matching.txt', 'w') as O:
-                    O.write('Matching is super-stable' + ' \n')
-                    l = len(self.M)
-                    for i in range(1, l + 1):
-                        if len(self.M['s' + str(i)]) == 0:
-                            O.write(str(i) + '\n')
-                        else:
-                            O.write(str(i) + ' ')
-                            matched_project = list(self.M['s' + str(i)])
-                            sliced = [p[1:] for p in matched_project]
-                            O.writelines('%s ' % i for i in sliced)
-                            O.write('\n')
-                    O.close()
+            O.close()
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
-s = SPATSUPER()
-s.runAlgorithm()
+
+runAlgorithm()

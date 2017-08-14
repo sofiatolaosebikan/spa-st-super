@@ -5,18 +5,18 @@ from copy import deepcopy
 
 
 class SPASTIG:
-    def __init__(self):
+    def __init__(self, students, lower_bound, upper_bound):
 
-        self.students = int(sys.argv[1])
+        self.students = students
         self.projects = int(math.ceil(0.5*self.students))
         self.lecturers = int(math.ceil(0.2*self.students))  # assume number of lecturers <= number of projects
         self.tpc = int(math.ceil(1.5*self.students))  # assume total project capacity >= number of projects #
         self.tlc = int(math.ceil(1.2*self.students))  # assume total lecturer capacity >= number of lecturers
-        self.li = int(sys.argv[2])  # lower bound of the student's preference list
-        self.lj = int(sys.argv[3])  # upper bound of the student's preference list
-        self.infile = sys.argv[4]
-        self.student_tie_threshold = float(sys.argv[5])
-        self.lecturer_tie_threshold = float(sys.argv[6])
+        self.li = lower_bound  # lower bound of the student's preference list
+        self.lj = upper_bound  # int(sys.argv[3])  # upper bound of the student's preference list
+        # self.infile = filename  # sys.argv[4]
+        #self.student_tie_threshold = stie_threshold  # float(sys.argv[5])
+        #self.lecturer_tie_threshold = ltie_threshold  # float(sys.argv[6])
 
         self.sp = {}
         self.plc = {}
@@ -32,9 +32,9 @@ class SPASTIG:
             number of students
             lower bound of the student's preference list
             upper bound of the student's preference list
-            the file name to write the instance with a .txt extension.
-            threshold for student tie -- a floating number between 0 and 1 -- [the closer the threshold is to 1, the more the ties]
-            threshold for lecturer tie
+            #the file name to write the instance with a .txt extension.
+            #threshold for student tie -- a floating number between 0 and 1 -- [the closer the threshold is to 1, the more the ties]
+            #threshold for lecturer tie
         """
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ---------------------------------------        ====== PROJECTS =======                    -----------------------------------------------
@@ -103,8 +103,8 @@ class SPASTIG:
 
         # -----------------------------------------------------------------------------------------------------------------------------------------
 
-    def instance_generator_with_ties(self):
-        self.instance_generator_no_tie()
+    def instance_generator_with_ties(self, student_tie_threshold, lecturer_tie_threshold):
+
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ------------------------------------------- ========= CONSTRUCT STUDENTS TIE ========= --------------------------------------------------
         # -----------------------------------------------------------------------------------------------------------------------------------------
@@ -113,7 +113,7 @@ class SPASTIG:
             all_but_last = preference[:-1]
             tie_successor = []  # to decide if a project will be tied with its successor..
             for project in all_but_last:
-                if random.uniform(0,1) < (self.student_tie_threshold):
+                if random.uniform(0,1) < (student_tie_threshold):
                     tie_successor.append(True)
                 else:
                     tie_successor.append(False)
@@ -138,7 +138,7 @@ class SPASTIG:
             all_but_last = preference[:-1]
             tie_successor = []
             for student in all_but_last:
-                if random.uniform(0,1) < self.lecturer_tie_threshold:
+                if random.uniform(0,1) < lecturer_tie_threshold:
                     tie_successor.append(True)
                 else:
                     tie_successor.append(False)
@@ -160,10 +160,10 @@ class SPASTIG:
 
 
 
-    def write_instance_no_tie(self):  # writes the SPA instance to a txt file
+    def write_instance_no_tie(self, filename):  # writes the SPA instance to a txt file
 
         if __name__ == '__main__':
-            with open(self.infile, 'w') as I:
+            with open(filename, 'w') as I:
 
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 #  ...write number of student (n) number of projects (m) number of lecturers (k) ---- for convenience, they are all separated by space
@@ -203,10 +203,10 @@ class SPASTIG:
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 I.close()
 
-    def write_instance_with_ties(self):  # writes the SPA instance to a txt file
+    def write_instance_with_ties(self, filename):  # writes the SPA instance to a txt file
 
         if __name__ == '__main__':
-            with open(self.infile, 'w') as I:
+            with open(filename, 'w') as I:
 
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 #  ...write number of student (n) number of projects (m) number of lecturers (k) ---- for convenience, they are all separated by space
@@ -266,12 +266,30 @@ class SPASTIG:
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 I.close()
 
-S = SPASTIG()
-S.instance_generator_with_ties()
-S.write_instance_with_ties()
-#print(S.sp)
-# print()
-#print(S.lp)
-# print()
-# print(S.plc)
-#S.write_instance()
+students = 1000
+lower_bound = 50
+upper_bound = 50
+S = SPASTIG(students, lower_bound, upper_bound)
+for i in range(0, 51):
+    for j in range(0, 51):
+        S.instance_generator_no_tie()
+        stie_threshold = 0.005*i
+        ltie_threshold = 0.005*j
+        filename = '/home/sofiat/Dropbox/Glasgow/projects/spa-st-super-stability/experiments/2a/instance_'
+        S.instance_generator_with_ties(stie_threshold, ltie_threshold)
+        S.write_instance_with_ties(filename+str(i)+'_'+str(j)+'.txt')
+
+
+
+
+# Experiment 1
+# lower_bound = 50
+# upper_bound = 50
+# stie_threshold = 0.005
+# ltie_threshold = 0.005
+# for students in range(100, 3100, 100):
+#     S = SPASTIG(students, lower_bound, upper_bound)
+#     S.instance_generator_no_tie()
+#     filename = '/home/sofiat/Dropbox/Glasgow/projects/spa-st-super-stability/experiments/1a/instance_'
+#     S.instance_generator_with_ties(stie_threshold, ltie_threshold)
+#     S.write_instance_with_ties(filename+str(students)+'.txt')

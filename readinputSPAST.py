@@ -166,11 +166,11 @@ class READSPAST:
 # s.read_file(filename)
 # print(s.sp)
 # print()
-# print(s.sp_no_tie_deletions)
+# #print(s.sp_no_tie_deletions)
 # print(s.plc)
 # print()
 # print(s.lp)
-
+#
 
 
 """
