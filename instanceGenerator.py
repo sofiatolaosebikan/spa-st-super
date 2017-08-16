@@ -1,3 +1,4 @@
+import os
 import sys
 import random
 import math
@@ -266,30 +267,53 @@ class SPASTIG:
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 I.close()
 
-students = 1000
-lower_bound = 50
-upper_bound = 50
-S = SPASTIG(students, lower_bound, upper_bound)
-for i in range(0, 51):
-    for j in range(0, 51):
-        S.instance_generator_no_tie()
-        stie_threshold = 0.005*i
-        ltie_threshold = 0.005*j
-        filename = '/home/sofiat/Dropbox/Glasgow/projects/spa-st-super-stability/experiments/2a/instance_'
-        S.instance_generator_with_ties(stie_threshold, ltie_threshold)
-        S.write_instance_with_ties(filename+str(i)+'_'+str(j)+'.txt')
 
 
 
 
-# Experiment 1
+# # Experiment 1
 # lower_bound = 50
 # upper_bound = 50
+# stie_threshold = 0.05
+# ltie_threshold = 0.05
+# for students in range(100, 1100, 100):
+#     for i in range(1, 1001):
+#         S = SPASTIG(students, lower_bound, upper_bound)
+#         S.instance_generator_no_tie()
+#         filename = '/home/sofiat/Documents/Glasgow/research/spa-st-super-stability/experiments/1_05/' + str(students) + '/instance'
+#         S.instance_generator_with_ties(stie_threshold, ltie_threshold)
+#         S.write_instance_with_ties(filename + str(students) + '_' + str(i) + '.txt')
+#
+
+# Experiment 2
+lower_bound = 50
+upper_bound = 50
+for i in range(0, 11):
+    for j in range(0, 11):
+        folder_path = 'experiments/2/'+str(i)+'_'+str(j)  # experiments/2/0_0
+        os.makedirs(folder_path)
+        for student in range(100, 1100, 100):
+            instance_path = folder_path+'/'+str(student)  # experiments/2/0_0/100
+            os.makedirs(instance_path)
+            for k in range(1, 1001):
+                S = SPASTIG(student, lower_bound, upper_bound)
+                S.instance_generator_no_tie()
+                stie_threshold = 0.005*i
+                ltie_threshold = 0.005*j
+                S.instance_generator_with_ties(stie_threshold, ltie_threshold)
+                filename = instance_path + '/' + 'instance' + str(k) + '.txt'
+                S.write_instance_with_ties(filename)
+
+
+# Experiment 3
 # stie_threshold = 0.005
 # ltie_threshold = 0.005
 # for students in range(100, 3100, 100):
+#     lower_bound = 0.25 * students
+#     upper_bound = 0.5 * students
 #     S = SPASTIG(students, lower_bound, upper_bound)
 #     S.instance_generator_no_tie()
-#     filename = '/home/sofiat/Dropbox/Glasgow/projects/spa-st-super-stability/experiments/1a/instance_'
+#     filename = '/home/sofiat/Dropbox/Glasgow/projects/spa-st-super-stability/experiments/3c/instance_'
 #     S.instance_generator_with_ties(stie_threshold, ltie_threshold)
 #     S.write_instance_with_ties(filename+str(students)+'.txt')
+#

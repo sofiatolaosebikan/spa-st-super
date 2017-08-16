@@ -1,20 +1,13 @@
-import sys
-import os
 from readinputSPAST import READSPAST
 from copy import deepcopy
+from time import *
+import sys
+import os
+import csv
 
 class SPATSUPER:
     def __init__(self, input):
-        """
-        Command line input is as follows
-        1 - name of the text file to read the instance
-        2 - name of text file to write the assignment relation
 
-        NOTE:
-            Pre-designed input works as follows
-                ::: tie-oddnumber.txt has no super-stable matching
-                ::: tie-evennumber.txt has a super-stable matching
-        """
         self.filename = input
         r = READSPAST()
         r.read_file(self.filename)
@@ -32,6 +25,7 @@ class SPATSUPER:
         self.lp_copy = r.lp_copy
 
         self.M = {}
+        self.not_assigned = 0
         self.multiple_assignment = False
         self.lecturer_capacity_checker = False  # if a lecturer's capacity was full during some iteration and subsequently became under-subscribed
         self.project_capacity_checker = False
@@ -368,6 +362,7 @@ class SPATSUPER:
     def check_stability(self):
         for student in self.M:
             if self.M[student] == set():  # if student s_i is not assigned in M, we check if it forms a blocking pair with all the projects in A(s_i).
+                self.not_assigned += 1
                 preferred_projects = self.sp_no_tie[student]  # list of pj's wrt to s_i s6 = ['p2', 'p3', 'p4', 'p5', 'p6']
 
             else:  # if student s_i is matched to a project in M
@@ -404,36 +399,74 @@ class SPATSUPER:
                 if self.blockingpair is True:
                     break
 
-# -------------------------------------------------------------------------------------------------------------------------------
-#  -------------------- Writes the matching to a text file, the first line verifies that that the matching is stable / not :|
-# -------------------------------------------------------------------------------------------------------------------------------
 def runAlgorithm():
 
     if __name__ == '__main__':
-        directory = 'experiments/2a/'
-        output = directory+'output.txt'
-        with open(output, 'w') as O:
-            for i in range(0, 51):
-                for j in range(0, 51):
-                    input_file = directory + 'instance_' + str(i) + '_' + str(j) + '.txt'
-                    s = SPATSUPER(input_file)
-                    s.algorithm()
-                    # -------------------------------------------------------------------------------------------------------------------------------
-                    # ~~~~~~~ OUTPUT NO SUPER STABLE MATCHING EXISTS IF ANY OF THE CONDITIONS ABOVE IS TRUE ::: OTHERWISE OUTPUT THE MATCHING ~~~~~~~
-                    # -------------------------------------------------------------------------------------------------------------------------------
+        for i in range(0, 11):
+            for j in range(0, 11):
+                folder_path = 'experiments/2/' + str(i) + '_' + str(j) + '/'  # experiments/2/0_0/
+                for student in range(100, 1100, 100):
+                    instance_path = folder_path + str(student) + '/'  # experiments/2/0_0/100/
+                    output = instance_path + 'output.csv'   # experiments/2/0_0/100/output.csv
+                    with open(output, 'w', newline='') as csvfile:
+                        O = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+                        for k in range(1, 1001):
+                            filename = 'instance' + str(k)
+                            input_file = instance_path + filename + '.txt'  # experiments/2/0_0/100/instance1.txt
+                            s = SPATSUPER(input_file)
+                            s.algorithm()
+                            s.check_stability()
+                            # -------------------------------------------------------------------------------------------------------------------------------
+                            # WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
+                            # -------------------------------------------------------------------------------------------------------------------------------
 
-                    if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
-                        O.write('instance_' + str(i) + '_' + str(j) + ': No super-stable matching exists' + ' \n')
+                            if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
+                                O.writerow([filename, 'N', 0])
 
-                    else:
-                        if s.blockingpair is True:
-                            O.write('instance_' + str(i) + '_' + str(j) + ': No super-stable matching exists.. REASON IS UNKNOWN..' + ' \n')
+                            else:
+                                if s.blockingpair is True:
+                                    O.writerow([filename, 'U', 0])
 
-                    if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
-                        O.write('instance_' + str(i) + '_' + str(j) + ': Has a super-stable matching' + ' \n')
+                            if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
+                                O.writerow([filename, 'Y', len(s.M) - s.not_assigned])
 
-            O.close()
+                        csvfile.close()
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 
 runAlgorithm()
+
+
+
+# Experiment 1
+# def runAlgorithm():
+#
+#     if __name__ == '__main__':
+#         for students in range(100, 1100, 100):
+#             directory = 'experiments/1_05/' + str(students)
+#             output = directory + '/output.csv'
+#             with open(output, 'w', newline='') as csvfile:
+#                 O = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+#                 for i in range(1, 1001):
+#                     filename = '/instance' + str(students) + '_' + str(i)
+#                     input_file = directory + filename + '.txt'
+#                     s = SPATSUPER(input_file)
+#                     # start_time = time()
+#                     s.algorithm()
+#                     # time_taken = time() - start_time
+#                     s.check_stability()
+#                     # -------------------------------------------------------------------------------------------------------------------------------
+#                     # WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
+#                     # -------------------------------------------------------------------------------------------------------------------------------
+#
+#                     if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
+#                         O.writerow([filename, 'N', 0])
+#
+#                     else:
+#                         if s.blockingpair is True:
+#                             O.writerow([filename, 'U', 0])
+#
+#                     if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
+#                         O.writerow([filename, 'Y', len(s.M) - s.not_assigned])
+#
+#                 csvfile.close()
