@@ -37,6 +37,8 @@ class SPATSUPER:
         # -------------------------------------------------------------------------------------------------------------------
         self.M = {'s' + str(i): set() for i in range(1, self.students+1)}  # assign all students to be free
         unassigned = ['s'+str(i) for i in range(1, self.students+1)]  # keep track of unassigned students
+        #unassigned = u[::-1]
+        #print(unassigned)
         # ------------------------------------------------------------------------------------------------------------------------
         #  -------------------------------------------------ALGORITHM STARTS HERE -------------------------------------------------
         # ------------------------------------------------------------------------------------------------------------------------
@@ -46,6 +48,7 @@ class SPATSUPER:
             # print('run while loop -', count_running)
             while unassigned:  # while some student is unassigned
                 student = unassigned.pop(0)  # the student at the tail of the list ::: super-stable matching is the same irrespective of which student is chosen first
+                print(student)
                 s_preference = self.sp[student][1]  # the projected preference list for this student.. this changes during the allocation process.
 
                 # if student_progress is not up to student length --- length is not 0-based!
@@ -224,19 +227,24 @@ class SPATSUPER:
             ###############################################################################################################################################
             for project in self.plc:
                 if self.plc[project][1] > 0 and self.plc[project][2] is True:
+                    print(project)
                     # Is l_k's worst assignee strictly worse or no better than s_i (any student who was rejected from p_j)
                     lecturer = self.plc[project][0]
                     P_k = set([i for i in self.lp[lecturer][2].keys()])  # all the projects that lecturer is offering
                     position_worst_tie = self.lp[lecturer][5]
+                    #print(position_worst_tie)
 
                     worst_students = self.lp[lecturer][1][position_worst_tie][:]  # deep copy of worst students at the tail of L_k
+                    #print(worst_students)
                     # the worst students assigned to l_k in M, since some students at the tail could be assigned to some other lecturer in M
                     worst_assignee = []
                     for w in worst_students:
                         if any(p in P_k for p in self.M[w]):
                             worst_assignee.append(w)
+                    #print(worst_assignee)
                     if len(worst_assignee) > 0:
                         rejected_students = self.plc[project][3]  # rejected students
+                        print(rejected_students)
                         while (position_worst_tie) >= 0:  # check all the ties of/before the worst assigned tie to see if any student rejected from p_j offered by l_k is contained there
                             if any(student in self.lp[lecturer][1][position_worst_tie] for student in rejected_students):
                                 self.run_algorithm = True
@@ -247,11 +255,13 @@ class SPATSUPER:
                         if self.run_algorithm is True:
                             self.plc[project][2] = False
                             index = self.lp[lecturer][5]
+                            #print(index, self.lp[lecturer][4])
                             while index < self.lp[lecturer][4]:
                                 for student in self.lp[lecturer][1][index]:
                                     A_s = set(self.sp_no_tie_deletions[student])  # the student's altered preference list without ties..
                                     common_projects = list(P_k.intersection(A_s))
                                     for project in common_projects:
+                                        print(student, project)
                                         try:
                                             p_rank = self.sp[student][2][project]
                                             self.sp[student][0][p_rank[0]][p_rank[1]] = 'dp'
@@ -399,57 +409,56 @@ class SPATSUPER:
                 if self.blockingpair is True:
                     break
 
-def runAlgorithm():
 
-    if __name__ == '__main__':
-        folder_path = 'experiments/3/length/'
-        for student in range(100, 1100, 100):
-            instance_path = folder_path + str(student) + '/'  # experiments/3/length10/100/
-            output = instance_path + 'output.csv'   # experiments/3a/100/output.csv
-            with open(output, 'w', newline='') as csvfile:
-                O = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
-                for k in range(1, 1001):
-                    filename = 'instance' + str(k)
-                    input_file = instance_path + filename + '.txt'  # experiments/3a/100/instance1.txt
-                    s = SPATSUPER(input_file)
-                    s.algorithm()
-                    s.check_stability()
-                    # -------------------------------------------------------------------------------------------------------------------------------
-                    # WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
-                    # -------------------------------------------------------------------------------------------------------------------------------
-
-                    if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
-                        O.writerow([filename, 'N', 0])
-
-                    else:
-                        if s.blockingpair is True:
-                            O.writerow([filename, 'U', 0])
-
-                    if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
-                        O.writerow([filename, 'Y', len(s.M) - s.not_assigned])
-
-                csvfile.close()
+# def runAlgorithm():
+#
+#         if __name__ == '__main__':
+#             folder_path = 'experiments/4/'
+#             output = folder_path + 'output.csv'   # experiments/4/output.csv
+#             with open(output, 'w', newline='') as csvfile:
+#                 O = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+#                 for k in range(1, 11):
+#                     filename = 'instance' + str(k)
+#                     input_file = folder_path + filename + '.txt'  # experiments/4/instance1.txt
+#                     s = SPATSUPER(input_file)
+#                     s.algorithm()
+#                     s.check_stability()
+#                     # -------------------------------------------------------------------------------------------------------------------------------
+#                     # WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
+#                     # -------------------------------------------------------------------------------------------------------------------------------
+#
+#                     if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
+#                         O.writerow([filename, 'N', 0])
+#
+#                     else:
+#                         if s.blockingpair is True:
+#                             O.writerow([filename, 'U', 0])
+#
+#                     if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
+#                         O.writerow([filename, 'Y', len(s.M) - s.not_assigned])
+#
+#                 csvfile.close()
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 
-runAlgorithm()
-# s = SPATSUPER('tie-strong_test.txt')
-# s.algorithm()
-#
-# s.check_stability()
-# # -------------------------------------------------------------------------------------------------------------------------------
-# # WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
-# # -------------------------------------------------------------------------------------------------------------------------------
-#
-# if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
-#     print('No')
-#
-# else:
-#     if s.blockingpair is True:
-#         print('No')
-#
-# if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
-#     print(s.M)
+#runAlgorithm()
+s = SPATSUPER('tie-failed.txt')
+s.algorithm()
+
+s.check_stability()
+# -------------------------------------------------------------------------------------------------------------------------------
+# WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
+# -------------------------------------------------------------------------------------------------------------------------------
+
+if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
+    print('No', s.M)
+
+else:
+    if s.blockingpair is True:
+        print('No')
+
+if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
+    print(s.M)
 
 
 # Experiment 1
@@ -518,3 +527,37 @@ runAlgorithm()
 #                                 O.writerow([filename, 'Y', len(s.M) - s.not_assigned])
 #
 #                         csvfile.close()
+
+
+
+# Experiment 3
+# def runAlgorithm():
+#
+#     if __name__ == '__main__':
+#         folder_path = 'experiments/3/length/'
+#         for student in range(100, 1100, 100):
+#             instance_path = folder_path + str(student) + '/'  # experiments/3/length10/100/
+#             output = instance_path + 'output.csv'   # experiments/3a/100/output.csv
+#             with open(output, 'w', newline='') as csvfile:
+#                 O = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+#                 for k in range(1, 1001):
+#                     filename = 'instance' + str(k)
+#                     input_file = instance_path + filename + '.txt'  # experiments/3a/100/instance1.txt
+#                     s = SPATSUPER(input_file)
+#                     s.algorithm()
+#                     s.check_stability()
+#                     # -------------------------------------------------------------------------------------------------------------------------------
+#                     # WRITE THE FILENAME<SPACE>Y/N SIGNIFYING IF A SUPER-STABLE MATCHING EXISTS<SPACE>CARDINALITY OF SUCH MATCHING AND 0 OTHERWISE
+#                     # -------------------------------------------------------------------------------------------------------------------------------
+#
+#                     if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
+#                         O.writerow([filename, 'N', 0])
+#
+#                     else:
+#                         if s.blockingpair is True:
+#                             O.writerow([filename, 'U', 0])
+#
+#                     if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
+#                         O.writerow([filename, 'Y', len(s.M) - s.not_assigned])
+#
+#                 csvfile.close()
