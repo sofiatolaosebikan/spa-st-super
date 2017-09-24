@@ -267,8 +267,17 @@ class SPASTIG:
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 I.close()
 
-
-
+# Experiment 4 -- Small instance to verify output from algorithm with IP
+fixed_tie_threshold = 0.05
+students = 50
+bound = 5
+for k in range(1, 11):
+    S = SPASTIG(students, bound, bound)
+    S.instance_generator_no_tie()
+    file = 'instance'+str(k)+'.txt'
+    filename = 'experiments/4/'+ file
+    S.instance_generator_with_ties(fixed_tie_threshold, fixed_tie_threshold)
+    S.write_instance_with_ties(filename)
 
 
 # # Experiment 1
@@ -305,16 +314,16 @@ class SPASTIG:
 #                 S.write_instance_with_ties(filename)
 
 
-# Experiment 3
-fixed_tie_threshold = 0.005
-for students in range(100, 1100, 100):
-    lower_bound = 0.25 * students
-    upper_bound = 0.5 * students
-    instance_path = 'experiments/3/length/' + str(students)  # experiments/3a/100
-    os.makedirs(instance_path)
-    for k in range(1, 1001):
-        S = SPASTIG(students, lower_bound, upper_bound)
-        S.instance_generator_no_tie()
-        filename = instance_path + '/' + 'instance' + str(k) + '.txt'  # experiments/3a/100/instance1.txt
-        S.instance_generator_with_ties(fixed_tie_threshold, fixed_tie_threshold)
-        S.write_instance_with_ties(filename)
+# # Experiment 3
+# fixed_tie_threshold = 0.005
+# for students in range(100, 1100, 100):
+#     lower_bound = 0.25 * students
+#     upper_bound = 0.5 * students
+#     instance_path = 'experiments/3/length/' + str(students)  # experiments/3a/100
+#     os.makedirs(instance_path)
+#     for k in range(1, 1001):
+#         S = SPASTIG(students, lower_bound, upper_bound)
+#         S.instance_generator_no_tie()
+#         filename = instance_path + '/' + 'instance' + str(k) + '.txt'  # experiments/3a/100/instance1.txt
+#         S.instance_generator_with_ties(fixed_tie_threshold, fixed_tie_threshold)
+#         S.write_instance_with_ties(filename)

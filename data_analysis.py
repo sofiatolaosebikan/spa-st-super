@@ -106,13 +106,14 @@ proportion_matching_3c = write_statistics(write_to_3c, write_from_3c)
 plt.figure()
 plt.grid()
 
-plt.plot(instances, proportion_matching_3a, color='r', label='pref_length = 5')
+#plt.plot(instances, proportion_matching_3a, color='r', label='pref_length = 5')
 plt.plot(instances, proportion_matching_3b, color='b', label='pref_length = 10')
-plt.plot(instances, proportion_matching_3c, color='g', label='pref_length = half(n1)')
+plt.plot(instances, proportion_matching_3c, color='r', label='pref_length = quarter(n1) to half(n1)')
 #plt.plot(instances, proportion_matching_1_05, color='b', label='0.05')
 
 plt.xlabel('instance size')
 plt.ylabel('proportion of soluble instances')
+plt.title('Proportion of instances that admits a super-stable matching with tie density fixed at 0.005 for students and lecturers')
 
 plt.legend(loc='upper right')
 plt.show()

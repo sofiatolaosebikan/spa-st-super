@@ -117,7 +117,7 @@ class READSPAST:
 
         for i in range(self.students+1, self.students+1+self.projects):
             entry = t[i].rstrip(' \n').split(' ')
-            # project = [lecturer, project_capacity, full(project) = False, keep track of students that was rejected from project]
+            # project = [lecturer, project_capacity_yet_to_be_filled, full(project) = False, keep track of students that was rejected from project]
             # length of the preferred students for p_j according to l_k to be appended when we have more information..
             self.plc['p'+str(entry[0])] = ['l'+str(entry[2]), int(entry[1]), False, set()]
         # -------------------------------------------------------------------------------------------------------------------
@@ -156,13 +156,15 @@ class READSPAST:
                     self.plc[project].append(len(d[project]))  # append len(L_k_j)
                     self.plc[project].append(len(d[project])-1)  # worst_student_pointer
 
+
             length = len(lecturerpreferencelist)
             # lecturer = [lecturer_capacity, lecturerpreferencelist, d, full(lecturer) = False, len(lecturerpreferencelist), worst_student_pointer]
             self.lp[lecturer] = [int(entry[1]), lecturerpreferencelist, d, False, length, length - 1]
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
 # s = READSPAST()
-# filename = sys.argv[1]
+# #filename = sys.argv[1]
+# filename = "instances/tie-22.txt"
 # s.read_file(filename)
 # print(s.sp)
 # print()
@@ -170,7 +172,7 @@ class READSPAST:
 # print(s.plc)
 # print()
 # print(s.lp)
-#
+
 
 
 """

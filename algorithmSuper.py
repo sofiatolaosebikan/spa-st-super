@@ -208,6 +208,8 @@ class SPATSUPER:
                                                 #  self.plc[project][3].add(successor)  # keep track of students who were rejected from project
                                             except:
                                                 pass
+                                        # if self.M[successor] == set() and self.sp[successor][3] < self.sp[successor][0] and successor not in unassigned:
+                                        #     unassigned.append(student)
                                     index += 1
                             ##############################################################################################################
 
@@ -442,7 +444,10 @@ class SPATSUPER:
 # -------------------------------------------------------------------------------------------------------------------------------
 
 #runAlgorithm()
-s = SPATSUPER('tie-failed.txt')
+#s = SPATSUPER('tie-failed.txt')
+#s = SPATSUPER('tie-strong_test.txt')
+s = SPATSUPER('instances/tie-19.txt')
+
 s.algorithm()
 
 s.check_stability()

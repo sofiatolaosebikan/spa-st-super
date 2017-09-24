@@ -46,10 +46,9 @@ class SPATSUPER:
         count_running = 1  # debugging purpose, to know the number of times the while loop is repeated..
         while self.run_algorithm is True:
             self.run_algorithm = False
-            # print('run while loop -', count_running)
             while unassigned:  # while some student is unassigned
                 student = unassigned.pop(0)  # the student at the tail of the list ::: super-stable matching is the same irrespective of which student is chosen first
-                print(student)
+                #print(student)
                 s_preference = self.sp[student][1]  # the projected preference list for this student.. this changes during the allocation process.
 
                 # if student_progress is not up to student length --- length is not 0-based!
@@ -222,7 +221,7 @@ class SPATSUPER:
                 if self.M[student] == set() and self.sp[student][3] < self.sp[student][0]:
                     unassigned.append(student)
                 #########################################################################################################################################
-            #print('before deficiency', self.M)
+
             ###############################################################################################################################################
             # --- At this point, the current execution of the while loop is done and all unassigned students has an empty list..
             # loop, and if the lecturer l_k offering p_j strictly prefers/is indifferent between any of the students rejected from p_j to its worst
@@ -231,66 +230,62 @@ class SPATSUPER:
 
             for project in self.plc:
                 if self.run_algorithm is False and self.plc[project][1] > 0 and self.plc[project][2] is True:
-                    deficiency = self.plc[project][1]
+                    deficiency = self.plc[project][1]  # -- this is q
                     print(project, deficiency, self.plc[project], self.M)
-                    # Is l_k's worst assignee strictly worse or no better than s_i (any student who was rejected from p_j)
                     lecturer = self.plc[project][0]
                     P_k = set([i for i in self.lp[lecturer][2].keys()])  # all the projects that lecturer is offering
                     position_worst_tie = self.lp[lecturer][5]
-                    print(position_worst_tie)
-
-                    #worst_students = self.lp[lecturer][1][position_worst_tie][:]  # deep copy of k worst students at the tail of L_k
-                    worst_students = self.lp[lecturer][1][(position_worst_tie+1)-deficiency:position_worst_tie+1]  # deep copy of k worst students at the tail of L_k
-                    print(worst_students)
-                    #print(worst_students)
-                    # the worst students assigned to l_k in M, since some students at the tail could be assigned to some other lecturer in M
-                    worst_assignee = []
-                    for tie in worst_students:
-                        for w in tie:
-                            if any(p in P_k for p in self.M[w]):
-                                worst_assignee.append(w)
-                    #print(worst_assignee)
-                    if len(worst_assignee) > 0:
+                    print(position_worst_tie)  # the last tie on L_k that is yet to be deleted from l_k's preference list
+                    # the next line is exactly Q in line 39 of the algorithm
+                    Q = self.lp[lecturer][1][(position_worst_tie+1)-deficiency:position_worst_tie+1]  # deep copy of k worst students at the tail of L_k, including the last tie
+                    # some or all of these worst assignees might not be assigned to l_k in M -- some of them might even be better than the rejected_students
+                    # we also need to check if these worst_students are no better than the rejected students according to L_k
+                    if len(Q) > 0:
                         rejected_students = self.plc[project][3]  # rejected students
                         print(rejected_students)
-                        while (position_worst_tie) >= 0:  # check all the ties of/before the worst assigned tie to see if any student rejected from p_j offered by l_k is contained there
+                        #print(self.lp[lecturer][1])
+                        # the following while loop is checking to see if l_k prefers or is indifferent between any student rejected from p_j and its last k worst students
+                        # how about we check (q) students inward from position_worst_tie
+                        while (position_worst_tie) >= 0:  # check all the ties of/before students in Q to see if it contains any student rejected from p_j
                             if any(student in self.lp[lecturer][1][position_worst_tie] for student in rejected_students):
+                                #T = self.lp[lecturer][1][(self.lp[lecturer][5] + 1) - deficiency:self.lp[lecturer][5] + 1]
                                 self.run_algorithm = True
                                 count_running += 1
-                                print('count', count_running)
+                                #print('count', count_running)
                                 break
                             position_worst_tie -= 1
-                        # delete all the projects worst assignees and strict successors has in common with the lecturer
+
                         if self.run_algorithm is True:
-                            #self.plc[project][2] = False
-                            index = (self.lp[lecturer][5] - deficiency) + 1
-                            print(index, self.lp[lecturer][4])
-                            while index < self.lp[lecturer][4]:  # index should be checked against position of lecturer's worst tie -- as students after this might have been deleted
-                                for student in self.lp[lecturer][1][index]:
-                                    A_s = set(self.sp_no_tie_deletions[student])  # the student's altered preference list without ties..
-                                    common_projects = list(P_k.intersection(A_s))
-                                    for project in common_projects:
-                                        print(student, project)
+                            print(Q)
+                            while Q:
+                                T = Q.pop()
+                                print('T', T)
+                                for s_t in T:
+                                    A_t = set(self.sp_no_tie_deletions[s_t])  # the student's altered preference list without ties..
+                                    common_projects = list(P_k.intersection(A_t))
+                                    for p_u in common_projects:
+                                        print(s_t, p_u)
                                         try:
-                                            p_rank = self.sp[student][2][project]
-                                            self.sp[student][1][p_rank[0]][p_rank[1]] = 'dp'
-                                            self.sp_no_tie_deletions[student].remove(project)
-                                            self.plc[project][3].add(student)
+                                            p_rank = self.sp[s_t][2][p_u]
+                                            self.sp[s_t][1][p_rank[0]][p_rank[1]] = 'dp'
+                                            self.sp_no_tie_deletions[s_t].remove(p_u)
+                                            self.plc[p_u][3].add(s_t)
                                         except:
                                             pass
                                         # ---- if the student is provisionally assigned to that project, we break the assignment..
-                                        if project in self.M[student]:
-                                            self.M[student].remove(project)  # data structure in use is set to make remove faster..
-                                            self.plc[project][1] += 1  # increment the project capacity
+                                        if p_u in self.M[s_t]:
+                                            self.M[s_t].remove(p_u)  # data structure in use is set to make remove faster..
+                                            self.plc[p_u][1] += 1  # increment the project capacity
                                             self.lp[lecturer][0] += 1  # increment the lecturer capacity
                                     # ---- if the worst_student no longer has any provisional projects, but has a non-empty preference list
                                     #  we add them back to the unassigned list..
-                                    if self.M[student] == set() and len(self.sp_no_tie_deletions[student]) != 0:
-                                        unassigned.append(student)
+                                    if self.M[s_t] == set() and len(self.sp_no_tie_deletions[s_t]) > 0:
+                                        unassigned.append(s_t)
                                         # print('unassigned students', unassigned)
-
-                                index += 1
-                            self.lp[lecturer][5] -= deficiency # the position of lecturer's worst tie has now moved inward by the number of ties deleted (which is the deficiency)
+                                self.lp[lecturer][5] -= 1 # the position of lecturer's worst tie moves inward by the number of ties deleted (which is 1)
+                                # what if there are more than two students from different ties rejected from p_j -- discuss with david? can this happen?
+                                if any(s_t in rejected_students for s_t in T):
+                                    break
         #####################################################################################################################################################
         # If our final assignment relation has any of these three conditions, we can safely report that no super-stable matching exists in the given instance
         #####################################################################################################################################################
@@ -453,7 +448,7 @@ class SPATSUPER:
 #runAlgorithm()
 #s = SPATSUPER('tie-failed.txt')
 #s = SPATSUPER('tie-strong_test.txt')
-s = SPATSUPER('instances/tie-24.txt')
+s = SPATSUPER('instances/tie-22.txt')
 
 s.algorithm()
 
