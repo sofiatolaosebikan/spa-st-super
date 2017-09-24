@@ -1,10 +1,10 @@
-from readinputSPAT import RISPAT
+from readinputSPAST import READSPAST
 from copy import deepcopy
 class find_all_matching:
-    def __init__(self):
+    def __init__(self, filename):
 
-        r = RISPAT()
-        r.read_file()
+        r = READSPAST()
+        r.read_file(filename)
         self.sp = deepcopy(r.sp)
         self.sp_copy = deepcopy(r.sp_copy)
         self.sp_no_tie = deepcopy(r.sp_no_tie)
@@ -183,8 +183,8 @@ class find_all_matching:
                 print('to find an assignment relation, run algorithm-SPAT-SUPER')
 
 
-
-find_all_matching().run()
+filename = 'instances/tie-3.txt'
+find_all_matching(filename).run()
 
 
 #
