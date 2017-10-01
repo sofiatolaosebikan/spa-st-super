@@ -448,7 +448,7 @@ class SPATSUPER:
 #runAlgorithm()
 #s = SPATSUPER('tie-failed.txt')
 #s = SPATSUPER('tie-strong_test.txt')
-s = SPATSUPER('instances/tie-22.txt')
+s = SPATSUPER('instances/tie-30.txt')
 
 s.algorithm()
 
