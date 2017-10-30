@@ -18,9 +18,6 @@ class READSPAST:
         self.plc = {}
         self.lp = {}
 
-
-
-
     def read_file(self, filename):  # reads the SPAT instance
         """
         # !* changed type of tie from tuple to list -- tuple does not support item assignment -- at the point we will replace some projects as dp
@@ -219,13 +216,4 @@ student_preferences = {'s7': [2, [['p3', 'p5'], ['p8']],
                                     'p2': ['l1', 1, False, set(['s3', 's5', 's6','s4','s2']), 2, -1],
                                     'p1': ['l1', 2, True, set(['s3', 's5', 's1',s2]), 2, 0],
                                     'p3': ['l1', 0, True, set(), 3, 0]}
-
-	
- student_preferences_no_tie_deletions = {'s7': {'p3','p8'}, 
-					's4': {}, 
-					's1': {'p7'}, 
-					's5': {}, 
-					's6': {}, 
-					's2': {'p5', 'p6'}, 
-					's3': {'p4'}}
 """

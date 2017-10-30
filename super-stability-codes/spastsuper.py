@@ -1,11 +1,9 @@
 from readinputSPAST import READSPAST
 from copy import deepcopy
 from time import *
-import sys
-import os
-import csv
 
-class SPATSUPER:
+
+class SPASTSUPER:
     def __init__(self, input):
 
         self.filename = input
@@ -26,6 +24,7 @@ class SPATSUPER:
 
         self.M = {}
         self.not_assigned = 0
+        self.assigned = 0
         self.multiple_assignment = False
         self.lecturer_capacity_checker = False  # if a lecturer's capacity was full during some iteration and subsequently became under-subscribed
         self.project_capacity_checker = False
@@ -34,7 +33,10 @@ class SPATSUPER:
         self.run_algorithm = True
         self.blockingpair = False
 
+        self.time_taken = 0
+
     def algorithm(self):
+        start_time = time()
         # -------------------------------------------------------------------------------------------------------------------
         self.M = {'s' + str(i): set() for i in range(1, self.students+1)}  # assign all students to be free
         unassigned = ['s'+str(i) for i in range(1, self.students+1)]  # keep track of unassigned students
@@ -243,7 +245,6 @@ class SPATSUPER:
                     if len(Q) > 0:
                         best_student_rejected = self.plc[project][3].pop()
                         self.plc[project][3].add(best_student_rejected)  # I popped and added the student back because set does not support indexing/slicing
-                        print(best_student_rejected)
                         # the following while loop is checking to see if l_k prefers best_students_rejected and the students in Q, or is indifferent between them
                         # how about we check all the students inward from position_worst_tie, then we stop when this best_student_rejected (s_r) is found
                         while (position_worst_tie) >= 0:  # check all the ties of/before the students in Q to see if it contains best_student_rejected
@@ -253,12 +254,10 @@ class SPATSUPER:
                             position_worst_tie -= 1
 
                         if self.run_algorithm is True:
-                            print(Q)
                             for s_t in Q:
                                 A_t = set(self.sp_no_tie_deletions[s_t])  # the student's altered preference list without ties..
                                 common_projects = list(P_k.intersection(A_t))
                                 for p_u in common_projects:
-                                    print(s_t, p_u)
                                     try:
                                         p_rank = self.sp[s_t][2][p_u]
                                         self.sp[s_t][1][p_rank[0]][p_rank[1]] = 'dp'
@@ -282,7 +281,7 @@ class SPATSUPER:
         #####################################################################################################################################################
         # If our final assignment relation has any of these three conditions, we can safely report that no super-stable matching exists in the given instance
         #####################################################################################################################################################
-
+        self.time_taken = time() - start_time
         # -------------------------------------------------------------------------------------------------------------------------------
         #   --------------------- 1 ::::  A STUDENT IS MULTIPLY ASSIGNED  -----------------------------
         # -------------------------------------------------------------------------------------------------------------------------------
@@ -368,6 +367,7 @@ class SPATSUPER:
                 preferred_projects = self.sp_no_tie[student]  # list of pj's wrt to s_i s6 = ['p2', 'p3', 'p4', 'p5', 'p6']
 
             else:  # if student s_i is matched to a project in M
+                self.assigned += 1
                 matched_project = self.M[student].pop()  # get the matched project
                 self.M[student].add(matched_project)
                 rank_matched_project = self.sp_copy[student][2][matched_project]  # find its rank on s_i's preference list A(s_i)
@@ -401,17 +401,5 @@ class SPATSUPER:
                 if self.blockingpair is True:
                     break
 
-
-s = SPATSUPER('instances/tie-30.txt')
-s.algorithm()
-s.check_stability()
-
-if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
-    print('Known No', s.M)
-
-else:
-    if s.blockingpair is True:
-        print('Unknown No')
-
-if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
-    print(s.M)
+            if self.blockingpair is True:
+                break
