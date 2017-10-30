@@ -411,12 +411,12 @@ s.algorithm()
 s.check_stability()
 
 if s.multiple_assignment is True or s.lecturer_capacity_checker is True or s.project_capacity_checker is True:
-    print('Known No', s.M)
+    print('No super-stable matching exists. Reason is known! Assignment relation is: ', s.M)
 
 else:
     if s.blockingpair is True:
-        print('Unknown No')
+        print('No super-stable matching exists. Reason is unknown!')
 
 if s.multiple_assignment is False and s.lecturer_capacity_checker is False and s.project_capacity_checker is False and s.blockingpair is False:
-    print(s.M, s.assigned, s.time_taken)
+    print('The student-optimal super-stable matching is: ' s.M)
 """
