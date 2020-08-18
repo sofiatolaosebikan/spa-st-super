@@ -1,18 +1,14 @@
-                                                                                                                                   import os
-import sys
 import random
 import math
-from copy import deepcopy
 
 
-class SPASTIG:
+class SPAST:
     def __init__(self, students, lower_bound, upper_bound):
 
         self.students = students
         self.projects = int(math.ceil(0.5*self.students))
         self.lecturers = int(math.ceil(0.2*self.students))  # assume number of lecturers <= number of projects
-        self.tpc = int(math.ceil(1.2*self.students))  # assume total project capacity >= number of projects #
-        # self.tlc = int(math.ceil(1.2*self.students))  # assume total lecturer capacity >= number of lecturers
+        self.tpc = int(math.ceil(1.2*self.students))  # assume total project capacity >= number of projects #        
         self.li = lower_bound  # lower bound of the student's preference list
         self.lj = upper_bound  # int(sys.argv[3])  # upper bound of the student's preference list
 
@@ -23,20 +19,18 @@ class SPASTIG:
     def instance_generator_no_tie(self):
         """
         A program that generates a random instance for the student project allocation problem 
-        with student preferences over projects and lecturer preferences over students (with or without ties).
-        :return: a random instance of SPA-S or SPA-ST
+        with student preferences over projects and lecturer preferences over students (without ties!).
+        return: a random instance of SPA-S 
 
         
         It takes argument as follows:
             number of students
-            lower bound of the student's preference list length
-            upper bound of the student's preference list length
-            #the file name to write the instance with a .txt extension.
-            #threshold for student tie -- a floating number between 0 and 1 -- [the closer the threshold is to 1, the more the ties]
-            #threshold for lecturer tie
+            lower bound of the students' preference list length
+            upper bound of the students' preference list length
         """
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ---------------------------------------        ====== PROJECTS =======                    -----------------------------------------------
+        # here we decide the capacity for each project, in such a way that each project has capacity >= 1
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # projects have [at least capacity 1, empty string to assign lecturer, empty list to store students]
         self.plc = {'p'+str(i): [1, '', []] for i in range(1, self.projects+1)}
@@ -44,10 +38,13 @@ class SPASTIG:
         # randomly assign the remaining project capacities
         for i in range(self.tpc - self.projects):  # range(9 - 8) = range(1) = 1 iteration. Okay!
             self.plc[random.choice(project_list)][0] += 1
+            
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ---------------------------------------        ====== STUDENTS =======                    -----------------------------------------------
+        # here we decide the length l of each student's preference list
+        # we also choose l projects at random, which forms the student's preference list
         # -----------------------------------------------------------------------------------------------------------------------------------------
-        self.sp = {'s' + str(i): [] for i in range(1, self.students + 1)}  # stores randomly selected projects
+        self.sp = {'s' + str(i): [[]] for i in range(1, self.students + 1)}  # stores randomly selected projects
         for student in self.sp:
             length = random.randint(self.li, self.lj)  # randomly decide the length of each student's preference list
             #  based on the length of their preference list, we provide projects at random
@@ -55,7 +52,7 @@ class SPASTIG:
             for i in range(length):
                 p = random.choice(projects_copy)
                 projects_copy.remove(p)  # I did this to avoid picking the same project 2x. This could also be achieved by shuffling and popping?
-                self.sp[student].append(p)
+                self.sp[student][0].append(p)
                 self.plc[p][2].append(student)
 
         # -----------------------------------------------------------------------------------------------------------------------------------------
@@ -70,7 +67,7 @@ class SPASTIG:
             # the number of projects a lecturer can offer is firstly bounded below by 1 and above by ceil(total_projects/total_lecturers)
             # to ensure projects are evenly distributed among lecturers
             number_of_projects = random.randint(1, upper_bound)
-            for i in range(number_of_projects):
+            for _ in range(number_of_projects):
                 p = random.choice(projects_copy)
                 projects_copy.remove(p)  # I did this to avoid picking the same project 2x. This could also be achieved by shuffling and popping?
                 self.plc[p][1] = lecturer  # take note of the lecturer who is offering the project
@@ -105,61 +102,39 @@ class SPASTIG:
     def instance_generator_with_ties(self, student_tie_threshold, lecturer_tie_threshold):
 
         # -----------------------------------------------------------------------------------------------------------------------------------------
-        # ------------------------------------------- ========= CONSTRUCT STUDENTS TIE ========= --------------------------------------------------
+        # ------------------------------------------- ========= TIES IN STUDENTS LIST ========= --------------------------------------------------
         # -----------------------------------------------------------------------------------------------------------------------------------------
-        for student in self.sp:
-            preference = self.sp[student]
-            all_but_last = preference[:-1]
-            tie_successor = []  # to decide if a project will be tied with its successor..
-            for project in all_but_last:
-                if random.uniform(0,1) < (student_tie_threshold):
-                    tie_successor.append(True)
+        for student in self.sp:            
+            preference = self.sp[student][0][:]            
+            # to decide if a project will be tied with its successor..
+            # if student_tie_threshold = 0, no tie in the preference list
+            # if student_tie_threshold = 1, the preference list is a single tie
+            preference_with_ties = [[preference[0]]]
+            for project in preference[1:]:
+                if random.uniform(0,1) <= student_tie_threshold:
+                    preference_with_ties[-1].append(project)
                 else:
-                    tie_successor.append(False)
-            if len(preference) == 1:
-                self.sp[student] = [[preference]]
-            else:
-                preference_with_ties = []
-                counter = 0
-                while counter != len(preference):
-                    temp = [preference[counter]]
-                    while counter < len(preference)-1 and tie_successor[counter] != False:
-                        counter += 1
-                        temp.append(preference[counter])
-                    preference_with_ties.append(temp)
-                    counter += 1
-                self.sp[student] = [preference, tie_successor, preference_with_ties]
+                    preference_with_ties.append([project])
+            self.sp[student].append(preference_with_ties)
+                
+           
         # -----------------------------------------------------------------------------------------------------------------------------------------
-        # ------------------------------------------- ========= CONSTRUCT LECTURERS TIE ========= --------------------------------------------------
+        # ------------------------------------------- ========= TIES IN LECTURERS LIST ========= --------------------------------------------------
         # -----------------------------------------------------------------------------------------------------------------------------------------
         for lecturer in self.lp:
-            preference = self.lp[lecturer][2]
-            all_but_last = preference[:-1]
-            tie_successor = []
-            for student in all_but_last:
-                if random.uniform(0,1) < lecturer_tie_threshold:
-                    tie_successor.append(True)
+            preference = self.lp[lecturer][2][:]
+            preference_with_ties = [[preference[0]]]
+            for student in preference[1:]:
+                if random.uniform(0,1) <= lecturer_tie_threshold:
+                    preference_with_ties[-1].append(student)
                 else:
-                    tie_successor.append(False)
-            if len(preference) == 1:  # a lecturer having just one student on their preference list -- I doubt this will happen during the random distribution
-                self.lp[lecturer].append([preference])
-            else:
-                self.lp[lecturer].append(tie_successor)
-                preference_with_ties = []
-                counter = 0
-                while counter != len(preference):
-                    temp = [preference[counter]]
-                    while counter < len(preference) - 1 and tie_successor[counter] != False:
-                        counter += 1
-                        temp.append(preference[counter])
-                    preference_with_ties.append(temp)
-                    counter += 1
-
-                self.lp[lecturer].append(preference_with_ties)
+                    preference_with_ties.append([student])
+            self.lp[lecturer].append(preference_with_ties)
+            
 
 
 
-    def write_instance_no_tie(self, filename):  # writes the SPA-S instance to a txt file
+    def write_instance_no_ties(self, filename):  # writes the SPA-S instance to a txt file
 
         if __name__ == '__main__':
             with open(filename, 'w') as I:
@@ -172,7 +147,7 @@ class SPASTIG:
                 # ---------------------------------------------------------------------------------------------------------------------------------------
                 # .. write the students index and their corresponding preferences ---- 1 2 3 1 7
                 for n in range(1, self.students + 1):
-                    preference = self.sp['s'+str(n)]
+                    preference = self.sp['s'+str(n)][0]
                     sliced = [p[1:] for p in preference]
                     I.write(str(n) + ' ')
                     I.writelines('%s ' % p for p in sliced)
@@ -267,13 +242,13 @@ class SPASTIG:
 
 
 
-#fixed_tie_threshold = 0.5
-#students = 10
-#bound = 3
-#for k in range(1, 10001):
-#    S = SPASTIG(students, bound, bound)
-#    S.instance_generator_no_tie()
-#    file = 'instance'+str(k)+'.txt'
-#    filename = 'instances/'+ file
-#    S.instance_generator_with_ties(0.1, 0.05)
-#    S.write_instance_with_ties(filename)
+# fixed_tie_threshold = 0.5
+# students = 10
+# bound = 3
+# for k in range(1, 11):
+#     S = SPAST(students, bound, bound)
+#     S.instance_generator_no_tie()
+#     file = 'instance'+str(k)+'.txt'
+#     filename = 'instances/'+ file
+#     S.instance_generator_with_ties(0, 0.5)
+#     S.write_instance_with_ties(filename)
