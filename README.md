@@ -1,7 +1,13 @@
-# spa-st-super
-An implementation of an algorithm to find a super-stable matching or to report that no such matching exists, given an instance of the Student-Project Allocation problem with Ties (SPA-ST).
+This repository contains the codes that was used to produce the experimental evaluation in the following paper:
 
-Background information and theoretical results can be found in:
-
-Olaosebikan, S. and Manlove, D. (2020). Super-stability in the student-project allocation problem with ties. 
+>>> Olaosebikan, S. and Manlove, D. (2020). Super-stability in the student-project allocation problem with ties. 
 Journal of Combinatorial Optimization, (doi: 10.1007/s10878-020-00632-x) (Early Online Publication)
+
+=========
+
+>>> instanceGenerator.py
+
+This generates a random instance of the student-project allocation problem with students preferences over projects, lecturer preferences over student, and with ties.
+
+=========
+
