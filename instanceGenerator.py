@@ -3,31 +3,43 @@ import math
 
 
 class SPAST:
-    def __init__(self, students, lower_bound, upper_bound):
-
-        self.students = students
-        self.projects = int(math.ceil(0.5*self.students))
-        self.lecturers = int(math.ceil(0.2*self.students))  # assume number of lecturers <= number of projects
-        self.tpc = int(math.ceil(1.2*self.students))  # assume total project capacity >= number of projects #        
-        self.li = lower_bound  # lower bound of the student's preference list
-        self.lj = upper_bound  # int(sys.argv[3])  # upper bound of the student's preference list
-
-        self.sp = {}
-        self.plc = {}
-        self.lp = {}
-
-    def instance_generator_no_tie(self):
+    def __init__(self, students, pref_list_length_lb=2, pref_list_length_ub=2, student_tie_density=0, lecturer_tie_density=0):
         """
-        A program that generates a random instance for the student project allocation problem 
-        with student preferences over projects and lecturer preferences over students (without ties!).
-        return: a random instance of SPA-S 
-
+        A program that writes to a .txt file, a randomly-generated instance of the student project allocation problem 
+        with students preferences over projects, lecturers preferences over students, and with ties.
+        
         
         It takes argument as follows:
             number of students
             lower bound of the students' preference list length
             upper bound of the students' preference list length
+            the density of tie in the students preference list 
+            the density of tie in the lecturers preference list
+        
+        * the density of tie in the preference lists is a number between 0 and 1 (inclusive)
+        if the tie density is 0 on both sides, then the program writes an instance of SPA-S without ties
+        if the tie density is 1 on both sides, then the program writes an instance of SPA-ST, where 
+        each preference list is a single tie of length 1....
+        
+        * the tie density given is the probability (decided at random) that a project (or student) will be tied
+        with its successor.
+        
         """
+        self.students = students
+        self.projects = int(math.ceil(0.5*self.students))
+        self.lecturers = int(math.ceil(0.2*self.students))  # assume number of lecturers <= number of projects
+        self.tpc = int(math.ceil(1.2*self.students))  # assume total project capacity >= number of projects #        
+        self.li = pref_list_length_lb  # lower bound of the student's preference list
+        self.lj = pref_list_length_ub  # int(sys.argv[3])  # upper bound of the student's preference list
+        self.student_tie_density = student_tie_density
+        self.lecturer_tie_density = lecturer_tie_density
+        
+        self.sp = {}
+        self.plc = {}
+        self.lp = {}
+
+    def instance_generator_no_ties(self):
+
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ---------------------------------------        ====== PROJECTS =======                    -----------------------------------------------
         # here we decide the capacity for each project, in such a way that each project has capacity >= 1
@@ -99,7 +111,7 @@ class SPAST:
 
         # -----------------------------------------------------------------------------------------------------------------------------------------
 
-    def instance_generator_with_ties(self, student_tie_threshold, lecturer_tie_threshold):
+    def instance_generator_with_ties(self):
 
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ------------------------------------------- ========= TIES IN STUDENTS LIST ========= --------------------------------------------------
@@ -107,11 +119,11 @@ class SPAST:
         for student in self.sp:            
             preference = self.sp[student][0][:]            
             # to decide if a project will be tied with its successor..
-            # if student_tie_threshold = 0, no tie in the preference list
-            # if student_tie_threshold = 1, the preference list is a single tie
+            # if student_tie_density = 0, no tie in the preference list
+            # if student_tie_density = 1, the preference list is a single tie
             preference_with_ties = [[preference[0]]]
             for project in preference[1:]:
-                if random.uniform(0,1) <= student_tie_threshold:
+                if random.uniform(0,1) <= self.student_tie_density:
                     preference_with_ties[-1].append(project)
                 else:
                     preference_with_ties.append([project])
@@ -125,7 +137,7 @@ class SPAST:
             preference = self.lp[lecturer][2][:]
             preference_with_ties = [[preference[0]]]
             for student in preference[1:]:
-                if random.uniform(0,1) <= lecturer_tie_threshold:
+                if random.uniform(0,1) <= self.lecturer_tie_density:
                     preference_with_ties[-1].append(student)
                 else:
                     preference_with_ties.append([student])
@@ -137,6 +149,9 @@ class SPAST:
     def write_instance_no_ties(self, filename):  # writes the SPA-S instance to a txt file
 
         if __name__ == '__main__':
+            
+            self.instance_generator_no_ties()
+            
             with open(filename, 'w') as I:
 
                 # ---------------------------------------------------------------------------------------------------------------------------------------
@@ -180,6 +195,10 @@ class SPAST:
     def write_instance_with_ties(self, filename):  # writes the SPA-ST instance to a txt file
 
         if __name__ == '__main__':
+            
+            self.instance_generator_no_ties()
+            self.instance_generator_with_ties()
+            
             with open(filename, 'w') as I:
 
                 # ---------------------------------------------------------------------------------------------------------------------------------------
@@ -242,13 +261,11 @@ class SPAST:
 
 
 
-# fixed_tie_threshold = 0.5
 # students = 10
-# bound = 3
+# pref_list_length = 3
+# s_tie_density, l_tie_density = 0.05, 0.25
 # for k in range(1, 11):
-#     S = SPAST(students, bound, bound)
-#     S.instance_generator_no_tie()
+#     S = SPAST(students, pref_list_length, pref_list_length, s_tie_density, l_tie_density)    
 #     file = 'instance'+str(k)+'.txt'
-#     filename = 'instances/'+ file
-#     S.instance_generator_with_ties(0, 0.5)
+#     filename = 'rg_instances/'+ file
 #     S.write_instance_with_ties(filename)
