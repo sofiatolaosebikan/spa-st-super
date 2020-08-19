@@ -7,7 +7,7 @@ Journal of Combinatorial Optimization, (doi: 10.1007/s10878-020-00632-x) (Early 
 
 > instanceGenerator.py
 
-This generates a random instance of the student-project allocation problem with students preferences over projects, lecturer preferences over student, and with ties.
+This writes to a .txt file, a randomly-generated instance of the student-project allocation problem with students preferences over projects, lecturer preferences over student, and with ties.
 
 =========
 
