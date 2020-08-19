@@ -1,5 +1,3 @@
-import sys
-import random
 from copy import deepcopy
 
 
@@ -20,56 +18,18 @@ class READSPAST:
         self.lp_rank = {}
         self.proj_rank = {}
 
-    def read_file(self, filename):  # reads the SPAT instance
+    def read_file(self, filename):  # reads the SPAT instance from a file
         """
-        # !* changed type of tie from tuple to list -- tuple does not support item assignment -- at the point we will replace some projects as dp
+        # !* changed type of tie from tuple to list -- tuple does not support item assignment at the point we will replace some projects as dp
         The entries in the file is read and it returns the format below which is consequently used to find a super-stable matching
 
-        student_preferences = {'s7': [2, [['p3', 'p5'], ['p8']],
-                                    {'p5': (0, 1), 'p8': (1, 0), 'p3': (0, 0)}, 0],
-
-                                's2': [4, [['p1', 'p2'], ['p3'], ['p4', 'p5'], ['p6']],
-                                    {'p5': (2, 1), 'p6': (3, 0), 'p4': (2, 0), 'p2': (0, 1), 'p1': (0, 0), 'p3': (1, 0)}, 0],
-
-                                's6': [3, [['p2', 'p3'], ['p4'], ['p5', 'p6']],
-                                    {'p4': (1, 0), 'p5': (2, 0), 'p6': (2, 1), 'p2': (0, 0), 'p3': (0, 1)}, 0],
-
-                                's3': [2, [['p2', 'p1'], ['p4']],
-                                    {'p4': (1, 0), 'p1': (0, 1), 'p2': (0, 0)}, 0],
-
-                                's5': [3, [['p1'], ['p2', 'p3'], ['p4']],
-                                    {'p4': (2, 0), 'p1': (0, 0), 'p2': (1, 0), 'p3': (1, 1)}, 0],
-
-                                's1': [2, [['p1'], ['p7']],
-                                    {'p7': (1, 0), 'p1': (0, 0)}, 0],
-
-                                's4': [1, [['p2']],
-                                    {'p2': (0, 0)}, 0]}
-
-
-
-        lecturer_preference = {l_k : [d_k, list(L_k), {p_j: list(L_k_j))}, replete, len(L_k), tail(L_k)))]
-                                'l2': [2, [['s3'], ['s2'], ['s6', 's7'], ['s5']],
-                                  {'p5': [['s2'], ['s6', 's7']], 'p6': [['s2'], ['s6']], 'p4': [['s3'], ['s2'], ['s6'], ['s5']]}, False, 4, 3],
-
-                                'l3': [2, [['s1'], ['s7']],
-                                    {'p7': [['s1']], 'p8': [['s7']]}, False, 2, 1],
-
-                                'l1': [3, [['s7'], ['s4', 's1', 's2'], ['s3', 's5', 's6']],
-                                    {'p1': [['s1', 's2'], ['s3', 's5']], 'p2': [['s4', 's2'], ['s3', 's5', 's6']], 'p3': [['s7'], ['s2'], ['s5', 's6']]}, False, 3, 2]}
-
-                                    
+        self.sp = student_preferences = {s_i: [pref_list_length, list(A_i), {p_j: (tie_rank, project_rank_in_tie) for each p_j in A_i}], 0}
                                 
-                                    tail(L_k^j) = worst student pointer
-        project_lecturer_capacity = {p_j: [l_k, c_j, replete, [rejected_students[], len(L_k^j), tail(L_k^j)))], 
-                                    'p5': ['l2', 1, False, [], 2, 1], set --> list
-                                    'p6': ['l2', 1, False, set(), 2, 1],
-                                    'p4': ['l2', 1, False, set(), 4, 3],
-                                    'p7': ['l3', 1, False, set(), 1, 0],
-                                    'p8': ['l3', 1, False, set(), 1, 0],
-                                    'p2': ['l1', 1, False, set(), 2, 1],
-                                    'p1': ['l1', 2, False, set(), 2, 1],
-                                    'p3': ['l1', 1, False, set(), 3, 2]}
+        self.lp = lecturer_preference = {l_k : [d_k, list(L_k), {p_j: list(L_k_j))}, replete, len(L_k), tail(L_k)))]}
+                                    
+        self.plc = projects_info = {p_j: [l_k, c_j, replete, [rejected_students], len(L_k^j), tail(L_k^j)))}
+        * tail(L_k^j) will keep track of the worst student pointer
+        
         """
 
         with open(filename) as t:
@@ -176,66 +136,56 @@ class READSPAST:
             # lecturer = [lecturer_capacity, lecturerpreferencelist, d, full(lecturer) = False, len(lecturerpreferencelist), worst_student_pointer]
             self.lp[lecturer] = [int(entry[1]), lecturerpreferencelist, d, False, length-1, length - 1]
             self.lp_copy = deepcopy(self.lp)
+            
+            
+            
 # -------------------------------------------------------------------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------------------------------
-#s = READSPAST()
-##filename = sys.argv[1]
-#filename = "st3.txt"
-#s.read_file(filename)
-#print(s.sp)
-#print()
-##print(s.sp_no_tie_deletions)
-#print(s.plc)
-#print()
-#print(s.lp)
-#print()
-#print(s.lp_rank)
-#print()
-#print(s.proj_rank)
+# s = READSPAST()
+# filename = "instances/tie-3.txt"
+# s.read_file(filename)
+# print(s.sp)
+# print()
+# print(s.sp_no_tie)
+# print()
+# print(s.plc)
+# print()
+# print(s.lp)
+# print()
+# print(s.lp_rank)
+# print()
+# print(s.proj_rank)
 
 
 """
-U = []
-M = {s7:[p3], s6:[], s5:[], s4:[], 's3':[p4], s2:[p6],s1:[p7]}
-student_preferences = {'s7': [2, [['p3', 'p5'], ['p8']],
-                                    {'p5': (0, 1), 'p8': (1, 0), 'p3': (0, 0)}, 1],
+output for instances/tie-3.txt
 
-                                's2': [4, [['dp', 'dp'], ['dp'], ['dp', 'dp'], ['p6']],
-                                    {'p5': (2, 1), 'p6': (3, 0), 'p4': (2, 0), 'p2': (0, 1), 'p1': (0, 0), 'p3': (1, 0)}, 4],
+self.sp = {'s1': [1, [['p1']], {'p1': (0, 0)}, 0], 
+           's2': [2, [['p2', 'p3'], ['p1']], {'p2': (0, 0), 'p3': (0, 1), 'p1': (1, 0)}, 0], 
+           's3': [2, [['p3'], ['p1', 'p4']], {'p3': (0, 0), 'p1': (1, 0), 'p4': (1, 1)}, 0], 
+           's4': [1, [['p1']], {'p1': (0, 0)}, 0], 
+           's5': [2, [['p1', 'p2'], ['p4']], {'p1': (0, 0), 'p2': (0, 1), 'p4': (1, 0)}, 0]}
 
-                                's6': [3, [['dp', 'dp'], ['dp'], ['dp', 'dp']],
-                                    {'p4': (1, 0), 'p5': (2, 0), 'p6': (2, 1), 'p2': (0, 0), 'p3': (0, 1)}, 3],
+self.sp_no_tie = {'s1': ['p1'], 
+                  's2': ['p2', 'p3', 'p1'], 
+                  's3': ['p3', 'p1', 'p4'], 
+                  's4': ['p1'], 
+                  's5': ['p1', 'p2', 'p4']}
 
-                                's3': [2, [['dp', 'dp'], ['p4']],
-                                    {'p4': (1, 0), 'p1': (0, 1), 'p2': (0, 0)}, 2],
+self.plc = {'p1': ['l1', 2, False, [], 2, 2], 
+            'p2': ['l1', 1, False, [], 0, 0], 
+            'p3': ['l1', 1, False, [], 1, 1], 
+            'p4': ['l2', 1, False, [], 0, 0]}
 
-                                's5': [3, [['dp'], ['dp', 'dp'], ['dp']],
-                                    {'p4': (2, 0), 'p1': (0, 0), 'p2': (1, 0), 'p3': (1, 1)}, 1],
+self.lp = {'l1': [4, [['s1'], ['s4', 's3'], ['s5', 's2']], 
+                  {'p1': [['s1'], ['s4', 's3'], ['s5', 's2']], 'p2': [['s5', 's2']], 'p3': [['s3'], ['s2']]}, False, 2, 2], 
+           'l2': [1, [['s3', 's5']], {'p4': [['s3', 's5']]}, False, 0, 0]}
 
-                                's1': [2, [['dp'], ['p7']],
-                                    {'p7': (1, 0), 'p1': (0, 0)}, 2],
+self.lp_rank = {'l1': {'s1': 1, 's4': 2, 's3': 2, 's5': 3, 's2': 3}, 
+                'l2': {'s3': 1, 's5': 1}}
 
-                                's4': [1, [['dp']],
-                                    {'p2': (0, 0)}, 1]}
-
-
-
-        lecturer_preference = {'l2': [0, [['s3'], ['s2'], ['s6', 's7'], ['s5']],
-                                  {'p5': [['s2'], ['s6', 's7']], 'p6': [['s2'], ['s6']], 'p4': [['s3'], ['s2'], ['s6'], ['s5']]}, True, 4, 1],
-
-                                'l3': [1, [['s1'], ['s7']],
-                                    {'p7': [['s1']], 'p8': [['s7']]}, False, 2, 1],
-
-                                'l1': [2, [['s7'], ['s4', 's1', 's2'], ['s3', 's5', 's6']],
-                                    {'p1': [['s1', 's2'], ['s3', 's5']], 'p2': [['s4', 's2'], ['s3', 's5', 's6']], 'p3': [['s7'], ['ds'], ['ds', 'ds']]}, True, 3, 1]}
-
-
-        project_lecturer_capacity = {'p5': ['l2', 1, False, set([s6, s7]), 2, 0],
-                                    'p6': ['l2', 0, True, set([s6]), 2, 0],
-                                    'p4': ['l2', 0, True, set(['s6']), 4, 0],
-                                    'p7': ['l3', 0, True, set(), 1, 0],
-                                    'p8': ['l3', 1, False, set(), 1, 0],
-                                    'p2': ['l1', 1, False, set(['s3', 's5', 's6','s4','s2']), 2, -1],
-                                    'p1': ['l1', 2, True, set(['s3', 's5', 's1',s2]), 2, 0],
-                                    'p3': ['l1', 0, True, set(), 3, 0]}
+self.proj_rank = {'p1': {'s1': 1, 's4': 2, 's3': 2, 's5': 3, 's2': 3}, 
+                  'p2': {'s5': 1, 's2': 1}, 
+                  'p3': {'s3': 1, 's2': 2}, 
+                  'p4': {'s3': 1, 's5': 1}}
 """
