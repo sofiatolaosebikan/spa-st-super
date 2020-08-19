@@ -11,3 +11,7 @@ This writes to a .txt file, a randomly-generated instance of the student-project
 
 =========
 
+> readinput.py
+
+This reads the instance from the .txt file into a suitable data structure representing the students, projects and lecturers preference information.
+
