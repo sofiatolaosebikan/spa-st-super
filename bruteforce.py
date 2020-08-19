@@ -6,10 +6,10 @@ Created on Sat Dec 21 23:20:17 2019
 @author: sofiat
 """
 
-from readinputSPAST import READSPAST
+from readinput import READSPAST
 
 
-class SUSMBruteForce:
+class SuperBruteForce:
     def __init__(self, filename):
 
         self.filename = filename
@@ -26,30 +26,33 @@ class SUSMBruteForce:
         self.sp_no_tie_deletions = r.sp_no_tie_deletions
         self.plc = r.plc
         self.lp = r.lp
+        self.lp_copy = r.lp_copy
         self.lp_rank = r.lp_rank
         self.proj_rank = r.proj_rank
-        self.lp_copy = r.lp_copy
+        
         
         self.M = {s:'' for s in self.sp}
-        self.project_wstcounter = {'p' + str(i): [0, []] for i in range(1, len(self.plc)+1)}
-        self.lecturer_wstcounter = {'l' + str(i): [0, []] for i in range(1, len(self.lp)+1)}  
+        self.project_wstcounter = {'p' + str(i): [0, []] for i in range(1, self.projects+1)}
+        self.lecturer_wstcounter = {'l' + str(i): [0, []] for i in range(1, self.lecturers+1)}  
         
         self.blocking_pair = False
         self.found_susm = 'N'
     
     # =======================================================================    
-    # blocking pair types
+    # blocking pair types for super-stability
     # =======================================================================    
     def blockingpair_1bi(self, student, project, lecturer):
         #  project and lecturer are both under-subscribed
-        if self.plc[project][1] > 0 and self.lp[lecturer][0] > 0:
+        project_capacity, lecturer_capacity = self.plc[project][1], self.lp[lecturer][0]
+        if project_capacity > 0 and lecturer_capacity > 0:
             return True
         return False
     
     def blockingpair_1bii(self, student, project, lecturer):
         # p_j is undersubscribed, l_k is full and either s_i \in M(l_k)
         # or l_k prefers s_i to the worst student in M(l_k) or is indifferent between them
-        if self.plc[project][1] > 0 and self.lp[lecturer][0] == 0:
+        project_capacity, lecturer_capacity = self.plc[project][1], self.lp[lecturer][0]
+        if project_capacity > 0 and lecturer_capacity == 0:
             proj_in_M = self.M[student]
             if proj_in_M != '' and self.plc[proj_in_M][0] == lecturer: # i.e., s_i \in M(l_k)
                 return True
@@ -71,8 +74,8 @@ class SUSMBruteForce:
    
     
     # =======================================================================    
-    # Is M super stable? Check for blocking pair
-    # self.blocking_pair is set to True if blocking pair exists
+    # Is M super stable? Check for blocking pairs
+    # self.blocking_pair is set to True if a blocking pair exists
     # =======================================================================
     def check_stability(self):
         self.blocking_pair = False
@@ -89,11 +92,11 @@ class SUSMBruteForce:
         
             for project in preferred_projects:
                 lecturer = self.plc[project][0]
-                if self.blocking_pair is False:
+                if not self.blocking_pair:
                     self.blocking_pair = self.blockingpair_1bi(student,project, lecturer)
-                if self.blocking_pair is False:
+                if not self.blocking_pair:
                     self.blocking_pair = self.blockingpair_1bii(student, project, lecturer)                    
-                if self.blocking_pair is False:
+                if not self.blocking_pair:
                     self.blocking_pair = self.blockingpair_1biii(student, project, lecturer)
                     #print(student, project, lecturer, self.blocking_pair)
                 if self.blocking_pair:                
@@ -104,11 +107,12 @@ class SUSMBruteForce:
                 break
             
     def choose(self, i):
-        # finds ALL possible matching and returns Y if a super stable matching is found
+        # finds ALL possible matchings and print only the ones that are super-stable matching
+        # alternatively, print Y if a super stable matching is found
             
         if i > self.students:
             
-            # update the project and lecturer worst counter
+            # update the worst student pointer for each project and lecturer  
             for project in self.plc:
                 if self.project_wstcounter[project][1] != []:
                     self.project_wstcounter[project][0] = max(self.project_wstcounter[project][1])
@@ -117,20 +121,15 @@ class SUSMBruteForce:
                     self.lecturer_wstcounter[lecturer][0] = max(self.lecturer_wstcounter[lecturer][1])
             
             # find a blocking pair and set self.blocking_pair to True
-            self.check_stability()
-#            matching = {'s1': 'p2', 's2': 'p1', 's3': 'p2'}
-#            if self.M == matching:
-#                print(len(self.M), self.blocking_pair)
-#                
+            self.check_stability()          
             
-            if self.blocking_pair is False:
-                self.found_susm = 'Y'
-                #exit()
-                
+            if not self.blocking_pair:
+                self.found_susm = 'Y'            
                 
                 # uncomment the next two lines to print a super stable matching
                 #print('A super stable matching is: ')
-                #print(self.M)
+                print(self.M)
+                print('-------------')
          
             
         else:
@@ -143,8 +142,7 @@ class SUSMBruteForce:
                     self.plc[project][1] -= 1
                     self.lp[lecturer][0] -= 1
                     
-                    # append the rank of the student currently assigned to each project and lecturer
-                    # amend read file to consider student index
+                    # append the rank of the student currently assigned to each project and lecturer                    
                     student_rank_Lk = self.lp_rank[lecturer][student]
                     student_rank_Lkj = self.proj_rank[project][student]
                     self.project_wstcounter[project][1].append(student_rank_Lkj)
@@ -157,8 +155,8 @@ class SUSMBruteForce:
                     student_rank_Lkj = self.proj_rank[project][student]
                     
                     # remove the student's index from the current assignees of the project and lecturer
-                    self.project_wstcounter[project][1].remove(student_rank_Lkj)
                     self.lecturer_wstcounter[lecturer][1].remove(student_rank_Lk)
+                    self.project_wstcounter[project][1].remove(student_rank_Lkj)
 
                     # increment project and lecturer capacity 
                     self.plc[project][1] += 1
@@ -168,7 +166,7 @@ class SUSMBruteForce:
         return self.found_susm
    
 
-#filename = "CT/3/instance1117.txt"
-#S = SUSMBruteForce(filename)
-#result = S.choose(1)
-#print(result)
+# filename = "instances/tie-30.txt"
+# S = SuperBruteForce(filename)
+# result = S.choose(1)
+# print(result)
