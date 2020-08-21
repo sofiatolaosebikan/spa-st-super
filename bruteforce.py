@@ -13,8 +13,8 @@ class SuperBruteForce:
     def __init__(self, filename):
 
         self.filename = filename
-        r = READSPAST()
-        r.read_file(self.filename)
+        r = READSPAST(self.filename)
+        r.read_file()
 
         self.students = r.students # no of students
         self.projects = r.projects # no of projects
@@ -166,7 +166,7 @@ class SuperBruteForce:
         return self.found_susm
    
 
-# filename = "instances/tie-30.txt"
+# filename = "rg_instances/instance7162.txt"
 # S = SuperBruteForce(filename)
 # result = S.choose(1)
 # print(result)

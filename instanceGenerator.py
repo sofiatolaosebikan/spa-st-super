@@ -60,13 +60,26 @@ class SPAST:
         for student in self.sp:
             length = random.randint(self.li, self.lj)  # randomly decide the length of each student's preference list
             #  based on the length of their preference list, we provide projects at random
-            projects_copy = project_list[:]
+            projects_copy = project_list[:]            
             for i in range(length):
-                p = random.choice(projects_copy)
-                projects_copy.remove(p)  # I did this to avoid picking the same project 2x. This could also be achieved by shuffling and popping?
+                random.shuffle(projects_copy)
+                p = projects_copy.pop()
+                #projects_copy.remove(p)  # I did this to avoid picking the same project 2x. This could also be achieved by shuffling and popping?
                 self.sp[student][0].append(p)
                 self.plc[p][2].append(student)
 
+        # the next for loop ensures that each project is ranked by at least one student
+        student_list = [s for s in self.sp.keys()]
+        for project in self.plc:
+            if self.plc[p][2] == []:
+                random.shuffle(student_list)
+                random_student = student_list.pop() # since students > projects, we will not run out of students
+                random_project = self.sp[random_student][0].pop()
+                self.plc[random_project][2].remove(random_student)
+                
+                self.sp[random_student][0].append(project)
+                self.plc[project][2].append(random_student)
+                
         # -----------------------------------------------------------------------------------------------------------------------------------------
         # ---------------------------------------        ====== LECTURERS =======                    ----------------------------------------------
         # -----------------------------------------------------------------------------------------------------------------------------------------
@@ -135,6 +148,8 @@ class SPAST:
         # -----------------------------------------------------------------------------------------------------------------------------------------
         for lecturer in self.lp:
             preference = self.lp[lecturer][2][:]
+            # if len(preference) == 0:
+            #     print(self.lp, '\n', lecturer, preference)
             preference_with_ties = [[preference[0]]]
             for student in preference[1:]:
                 if random.uniform(0,1) <= self.lecturer_tie_density:
@@ -261,11 +276,11 @@ class SPAST:
 
 
 
-# students = 10
-# pref_list_length = 3
-# s_tie_density, l_tie_density = 0.05, 0.25
-# for k in range(1, 11):
-#     S = SPAST(students, pref_list_length, pref_list_length, s_tie_density, l_tie_density)    
-#     file = 'instance'+str(k)+'.txt'
-#     filename = 'rg_instances/'+ file
-#     S.write_instance_with_ties(filename)
+students = 10
+pref_list_length = 3
+s_tie_density, l_tie_density = 0.05, 0.25
+for k in range(1, 10001):
+    S = SPAST(students, pref_list_length, pref_list_length, s_tie_density, l_tie_density)    
+    file = 'instance'+str(k)+'.txt'
+    filename = 'rg_instances/'+ file
+    S.write_instance_with_ties(filename)
