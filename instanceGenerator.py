@@ -70,8 +70,8 @@ class SPAST:
 
         # the next for loop ensures that each project is ranked by at least one student
         student_list = [s for s in self.sp.keys()]
-        for project in self.plc:
-            if self.plc[p][2] == []:
+        for project in project_list:
+            if self.plc[project][2] == []:
                 random.shuffle(student_list)
                 random_student = student_list.pop() # since students > projects, we will not run out of students
                 random_project = self.sp[random_student][0].pop()
@@ -276,11 +276,11 @@ class SPAST:
 
 
 
-students = 10
+students = 15
 pref_list_length = 3
 s_tie_density, l_tie_density = 0.05, 0.25
-for k in range(1, 10001):
+for k in range(1, 100001):
     S = SPAST(students, pref_list_length, pref_list_length, s_tie_density, l_tie_density)    
     file = 'instance'+str(k)+'.txt'
-    filename = 'rg_instances/'+ file
+    filename = 'CT/'+ file
     S.write_instance_with_ties(filename)
