@@ -35,3 +35,9 @@ This implements the integer programming model described in Appendix A of the pap
 > runipmodel.py
 
 This runs the ipmodel from above on a given SPA-ST instance. You need to have the Gurobi optimization solver installed on your computer. See https://www.gurobi.com/documentation/quickstart.html
+
+=========
+
+> examples.ipynb
+
+We illustrate how to read the .txt file generated from a run of instanceGenerator.py.
