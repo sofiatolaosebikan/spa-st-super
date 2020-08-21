@@ -1,7 +1,6 @@
 This repository contains the codes that was used to produce the experimental evaluation in the following paper:
 
-> Olaosebikan, S. and Manlove, D. (2020). Super-stability in the student-project allocation problem with ties. 
-Journal of Combinatorial Optimization, (doi: 10.1007/s10878-020-00632-x) (Early Online Publication)
+> Olaosebikan, S. and Manlove, D. (2020). Super-stability in the student-project allocation problem with ties. Journal of Combinatorial Optimization, (doi: 10.1007/s10878-020-00632-x) (Early Online Publication)
 
 =========
 
@@ -35,4 +34,4 @@ This implements the integer programming model described in Appendix A of the pap
 
 > runipmodel.py
 
-This runs the ipmodel from above on a given SPA-ST instance.
+This runs the ipmodel from above on a given SPA-ST instance. You need to have the Gurobi optimization solver installed on your computer. See https://www.gurobi.com/documentation/quickstart.html

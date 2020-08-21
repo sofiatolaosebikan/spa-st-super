@@ -166,7 +166,7 @@ class SuperBruteForce:
         return self.found_susm
    
 
-# filename = "rg_instances/instance7162.txt"
+# filename = "instances/instance1.txt"
 # S = SuperBruteForce(filename)
 # result = S.choose(1)
 # print(result)

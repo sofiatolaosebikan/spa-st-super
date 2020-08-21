@@ -161,3 +161,8 @@ class RunSuperIP():
             else:
                 self.found_susm = 'BP'
         return self.found_susm
+
+
+# filename = "instances/instance1.txt"
+# R = RunSuperIP(filename)
+# print(R.run())

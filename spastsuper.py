@@ -456,16 +456,6 @@ class SuperPoly:
             self.outer_repeat()
             self.check_stability()
         
-            # print('student check :::>', self.student_checker())
-            # print('project check :::>', self.project_checker())
-            # print('lecturer check :::>', self.lecturer_checker())
-            # print('blocking pair check :::>', self.blocking_pair)
-            # for student in self.sp:
-            #     print(student, ':>', self.M[student])
-            # for project in self.plc:
-            #     print(project, ':>', self.M[project], self.plc[project])
-            # for lecturer in self.lp:
-            #     print(lecturer, ':>', self.M[lecturer])
             
             if self.student_checker() or self.lecturer_checker() or self.project_checker():
                 self.found_susm = 'N'
@@ -482,12 +472,7 @@ class SuperPoly:
             return self.found_susm 
     
     
-# for k in range(1,10001):    
-#     filename = "rg_instances/instance"+str(k)+".txt"
-#     s = SuperPoly(filename)
-#     r = s.run()
-#     if r !='U':
-#         print(str(k) + " " + r )
-#     else:
-#         print(str(k) + " " + r )
-#         break
+    
+# filename = "instances/instance1.txt"
+# s = SuperPoly(filename)
+# print(s.run())

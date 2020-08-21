@@ -276,11 +276,11 @@ class SPAST:
 
 
 
-students = 15
-pref_list_length = 3
-s_tie_density, l_tie_density = 0.05, 0.25
-for k in range(1, 100001):
-    S = SPAST(students, pref_list_length, pref_list_length, s_tie_density, l_tie_density)    
-    file = 'instance'+str(k)+'.txt'
-    filename = 'CT/'+ file
-    S.write_instance_with_ties(filename)
+# students = 10
+# pref_list_length = 3
+# s_tie_density, l_tie_density = 0.05, 0.25
+# for k in range(1, 6):
+#     S = SPAST(students, pref_list_length, pref_list_length, s_tie_density, l_tie_density)    
+#     file = 'instance'+str(k)+'.txt'
+#     filename = 'instances/'+ file
+#     S.write_instance_with_ties(filename)
