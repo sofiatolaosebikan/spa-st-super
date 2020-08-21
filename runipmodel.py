@@ -6,15 +6,15 @@ Last edited on Sat Feb  1 20:20:49 2020
 @author: sofiat
 """
 
-from IPModelSuper import IPModelSuper
+from ipmodel import SuperIP
          
-class IPSuper():
+class RunSuperIP():
     def __init__(self, filename):
         self.filename = filename
         self.M = {}
         self.obj = 0
         self.found_susm = None
-        self.G = IPModelSuper(self.filename)
+        self.G = SuperIP(self.filename)
         try:
             self.G.assignmentConstraints()
             self.G.objfunctionConstraints() 
@@ -161,7 +161,3 @@ class IPSuper():
             else:
                 self.found_susm = 'BP'
         return self.found_susm
-
-#I = IPSuper("CT/4/instance10000.txt")
-#I = IPStrongBP("../correctnessTesting/3/instance7359.txt")
-#print(I.run())

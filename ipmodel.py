@@ -6,16 +6,16 @@ Created on Sun Apr 12 13:20:31 2020
 @author: sofiat
 """
 
-from readinputSPAST import READSPAST
+from readinput import READSPAST
 from copy import deepcopy
 from gurobipy import *
 import csv
          
-class IPModelSuper():
+class SuperIP():
     def __init__(self, filename):
         self.filename = filename
-        r = READSPAST()
-        r.read_file(self.filename)
+        r = READSPAST(self.filename)
+        r.read_file()
         self.students = r.students
         self.projects = r.projects
         self.lecturers = r.lecturers
