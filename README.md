@@ -27,3 +27,12 @@ This finds all the super-stable matching, given an instance of SPA-ST, should on
 
 This is an implementation of the polynomial-time algorithm (Algorithm SPA-ST-Super), which was presented in the paper above. It finds a super-stable matching, given an instance of SPA-ST, should one exist. 
 
+=========
+
+> ipmodel.py
+
+This implements the integer programming model described in Appendix A of the paper above. It finds a super-stable matching, given an instance of SPA-ST, should one exist. The purpose of implementing this approach was to scale up the correctness testing of our polynomial-time algorithm implementation.
+
+> runipmodel.py
+
+This runs the ipmodel from above on a given SPA-ST instance.
