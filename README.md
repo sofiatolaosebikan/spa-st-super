@@ -21,3 +21,9 @@ This reads the instance from the .txt file into a suitable data structure repres
 
 This finds all the super-stable matching, given an instance of SPA-ST, should one exist. The purpose of implementing this approach was mainly for correctness testing of our implementation of the polynomial-time algorithm (spastsuper.py). The bruteforce implementation terminates in less than 5 seconds, on SPA-ST instances consisting of no more than 10 students with a preference list length of 3. 
 
+=========
+
+> spastsuper.py
+
+This is an implementation of the polynomial-time algorithm (Algorithm SPA-ST-Super), which was presented in the paper above. It finds a super-stable matching, given an instance of SPA-ST, should one exist. 
+
