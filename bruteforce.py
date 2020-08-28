@@ -128,8 +128,8 @@ class SuperBruteForce:
                 
                 # uncomment the next two lines to print a super stable matching
                 #print('A super stable matching is: ')
-                print(self.M)
-                print('-------------')
+                #print(self.M)
+                #print('-------------')
          
             
         else:

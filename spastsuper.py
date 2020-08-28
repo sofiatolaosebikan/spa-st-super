@@ -227,7 +227,7 @@ class SuperPoly:
                                 #print('delete line 12', st, project)
                                 
                         # ----------- if lecturer  is oversubscribed -----------
-                        elif self.M[lecturer][2] < 0:
+                        if self.M[lecturer][2] < 0:
                             Lk_students = self.lp[lecturer][1]
                             tail_index = self.lp[lecturer][4] 
                             tail_students = Lk_students[tail_index]
