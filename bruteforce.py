@@ -127,9 +127,9 @@ class SuperBruteForce:
                 self.found_susm = 'Y'            
                 
                 # uncomment the next two lines to print a super stable matching
-                #print('A super stable matching is: ')
-                #print(self.M)
-                #print('-------------')
+                # print('A super stable matching is: ')
+                # print(self.M)
+                # print('-------------')
          
             
         else:
@@ -166,7 +166,7 @@ class SuperBruteForce:
         return self.found_susm
    
 
-# filename = "instances/instance1.txt"
+# filename = "CT/instance20.txt"
 # S = SuperBruteForce(filename)
 # result = S.choose(1)
 # print(result)
