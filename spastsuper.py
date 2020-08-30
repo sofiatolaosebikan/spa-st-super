@@ -7,6 +7,7 @@ Created on Mon Mar 16 19:44:32 2020
 """
 
 from readinput import READSPAST
+from bruteforce import SuperBruteForce
 
 
 
@@ -42,8 +43,6 @@ class SuperPoly:
             self.M[lecturer] = [set(), set(), r.lp_copy[lecturer][0]] # [students assigned to l_k, non-empty p_j's in G offered by l_k, remnant of d_k]
 
         self.full_projects = set()
-
-        self.run_algorithm = True
         self.blocking_pair = False
         self.found_susm = 'N'
         self.restart_extra_deletions = False
@@ -53,17 +52,15 @@ class SuperPoly:
     # add pair (s_i, p_j) to M
     # =======================================================================    
     def add_edge_to_M(self, student, project, lecturer):
-        
         self.M[student].add(project) 
-        
         self.M[project][0].add(student)
-        self.M[project][1] -= 1  # reduce c_j
-        
-        #self.M[lecturer][0].add(student)        
+        self.M[lecturer][0].add(student)        
         self.M[lecturer][1].add(project)        
-        if student not in self.M[lecturer][0]:
-            self.M[lecturer][0].add(student)
-            self.M[lecturer][2] -= 1  # reduce d_k
+        self.M[project][1] -= 1  # reduce c_j
+        self.M[lecturer][2] -= 1  # reduce d_k
+        
+#        if student not in self.M[lecturer][0]:
+#            self.M[lecturer][0].add(student)
              
     
     
@@ -76,17 +73,14 @@ class SuperPoly:
             
             self.M[project][0].remove(student)
             self.M[project][1] += 1  # increment c_j   
-            
+            self.M[lecturer][2] += 1  # increment d_k
             # if the project becomes an isolated vertex
             if self.M[project][0] == set():
                 self.M[lecturer][1].remove(project)
             
             # if in M, student no longer has any project in common w/ lecturer
             if student in self.M[lecturer][0] and self.M[student].intersection(self.M[lecturer][1]) == set():
-                self.M[lecturer][0].remove(student)
-                self.M[lecturer][2] += 1  # increment d_k
-                # if full(l_k) was previously True, and l_k becomes undersubscribed here, we do not set it back to False
-                # Lemma 6 of the paper will kick in if the lecturer did not fill up at the termination of the algorithm
+                self.M[lecturer][0].remove(student)        
                 
 #                 if d_k > 0, set full(d_k) to False
                 #if self.M[lecturer][2] > 0:
@@ -100,8 +94,8 @@ class SuperPoly:
         # replace project with dp in the student's preference list
         # also remove it from sp_no_tie_deletions
         if project in self.sp_no_tie_deletions[student]:
-            # get the rank of pj on the student's list, say (2, 0)
-            # 2 is the position of p_j's tie T in A(s_i)
+            # get the rank of pj on the student's list
+            # say (2, 0): 2 is the position of p_j's tie T in A(s_i)
             # and 0 is the position of p_j in T
             p_rank = self.sp[student][2][project]
             self.sp[student][1][p_rank[0]][p_rank[1]] = 'dp'  # we replace the project in this position by a dummy project
@@ -123,8 +117,7 @@ class SuperPoly:
     def p_strict_successors(self, project):
         """
         param: p_j
-        return: starting index of strict successors in Lkj as well as the students,
-        or None, [] if pj has no strict successors.
+        return: starting index of strict successors in Lkj as well as the students
         """
         lecturer = self.plc[project][0]
         cj = self.plc[project][1]
@@ -141,9 +134,9 @@ class SuperPoly:
                 # second part of if statement takes care of scenario where pj has no strict successors
                 successor_index = i+1
                 self.plc[project][4] = i # pointer to index of new tail
-            
+                
             # successor_index could be None if pj is full and Lkj_tail_index is pointing to the worst tie
-            # i.e., if pj has no strict successors         
+            # i.e., if pj has no strict successors     
             if successor_index != None:
                 successor_students = Lkj_students[successor_index:]
                 break
@@ -159,35 +152,38 @@ class SuperPoly:
     def l_strict_successors(self, lecturer):
         """
         param: l_k
-        return: starting index of strict successors in Lk as well as the students,
-        or None, [] if lk has no strict successors.
+        return: starting index of strict successors in Lk as well as the students
         """
         
         dk = self.lp[lecturer][0]
-        Lk_students = self.lp[lecturer][1]  # students who chose some project offered by lk
-        Lk_tail_index = self.lp[lecturer][4] # should this index be 5? ****
-        Mlk = self.M[lecturer][0]
+        Lk_students = self.lp[lecturer][1]  # students who chose p_j according to Lk
+        Lk_tail_index = self.lp[lecturer][4]
+        #Mlk = self.M[lecturer][0]
+        lk_Mprojects = self.M[lecturer][1]
         successor_index = None
         successor_students = []
         count = 0
         for i in range(Lk_tail_index+1):
-            assigneees = Mlk.intersection(Lk_students[i])
-            count += len(assigneees)
-            #print(pj, Lk_students[i], count)
-            if count == dk and i < Lk_tail_index:
-                successor_index = i+1
-                self.lp[lecturer][4] = i
-            # we are guaranteed that successor_index will not be None at some point
-            # because we only find l_strict_successors when lk becomes full
-            # also pointer to index of tail should ONLY be updated when lecturer is full
+            for pj in lk_Mprojects:
+                Mpj = self.M[pj][0]
+                assigneees = Mpj.intersection(Lk_students[i])
+                #print(pj, Mpj, Lk_students[i], assigneees)
+                count += len(assigneees)
+                #print(pj, Lk_students[i], count)
+                if count == dk and i < Lk_tail_index:
+                    successor_index = i+1
+                    self.lp[lecturer][4] = i
+                # we are guaranteed that successor_index will not be None at some point
+                # because we only find p_strict_successors if pj is full
+                if successor_index != None:
+                    successor_students = Lk_students[successor_index:]
+                    break
             if successor_index != None:
-                successor_students = Lk_students[successor_index:]
                 break
-    
-#        print('L_k dominated index is: ', dominated_index)
-#        print('L_k dominated student is: ', dominated_students)
+            
+#        print('L_k_j dominated index is: ', dominated_index)
+#        print('L_k_j dominated student is: ', dominated_students)
         return successor_index, successor_students  
-    
     # =======================================================================
     # while loop that constructs M from students preference lists
     # =======================================================================    
@@ -196,13 +192,15 @@ class SuperPoly:
             
             student = self.unassigned.pop(0)  
 #            print('current student', student)
+            
             s_preference = self.sp[student][1]  # the projected preference list for this student.. this changes during the allocation process.
+            
             # self.sp[student][3] points to the tie at the head of s_i's list 
             # if tie pointer is not up to length of pref list --- length is not 0-based!
             head_index = self.sp[student][3] # 0-based
             pref_list_length = self.sp[student][0] # !0-based
 #            print('unassigned', self.unassigned, student, s_preference[self.sp[student][3]])
-            if head_index < pref_list_length:
+            if  head_index < pref_list_length:
                 tie = s_preference[head_index] # projects at the head of the list ::: could be length 1 or more
                 self.sp[student][3] += 1  # we increment head_index pointer --> moves inward by 1 
 #                print(tie)
@@ -219,7 +217,7 @@ class SuperPoly:
                             tail_index = self.plc[project][4] 
                             tail_students = Lkj_students[tail_index]
                             
-                            self.plc[project][4] -= 1 
+                            self.plc[project][4] -= 1                            
                             self.lp[lecturer][2][project] = self.lp[lecturer][2][project][:tail_index]
                             
                             for st in tail_students:
@@ -227,7 +225,7 @@ class SuperPoly:
                                 #print('delete line 12', st, project)
                                 
                         # ----------- if lecturer  is oversubscribed -----------
-                        if self.M[lecturer][2] < 0:
+                        elif self.M[lecturer][2] < 0:
                             Lk_students = self.lp[lecturer][1]
                             tail_index = self.lp[lecturer][4] 
                             tail_students = Lk_students[tail_index]
@@ -235,10 +233,10 @@ class SuperPoly:
                             self.lp[lecturer][4] -= 1                            
                             self.lp[lecturer][1] = self.lp[lecturer][1][:tail_index]
                             
-                            Pk = set([i for i in self.lp[lecturer][2].keys()])  # all the projects that lecturer is offering
+                            p_k = set([i for i in self.lp[lecturer][2].keys()])  # all the projects that lecturer is offering
                             for st in tail_students:
                                 a_t = set(self.sp_no_tie_deletions[st])  # the student's altered preference list without ties..
-                                common_projects = Pk.intersection(a_t)
+                                common_projects = p_k.intersection(a_t)
                                 for pu in common_projects:
                                     self.delete(st, pu, lecturer)
                                     #print('delete line 16', st, pu)
@@ -248,9 +246,14 @@ class SuperPoly:
                             self.plc[project][2] = True   # set full(p_j) to True     
                             successor_index, successor_students = self.p_strict_successors(project) # finds dominated students and the starting index on L_k^j
                             # we delete dominated students from L_k^j by replacing L_k_j with non-dominated students
+#                            if project == 'p3':
+#                                print('===', project, self.G[project], self.lp[lecturer][2][project], dominated_index, dominated_students)
                             if successor_index != None:
                                 self.lp[lecturer][2][project] = self.lp[lecturer][2][project][:successor_index] 
                                 #print('remaining L_k^j: ', self.lp[lecturer][2][project])
+                            #print()
+                            # for each dominated student, delete (student, project)     
+                            #print(successor_index, successor_students)
                                 for tie in successor_students:
                                     for st in tie:
                                         self.delete(st, project, lecturer)                                    
@@ -260,15 +263,20 @@ class SuperPoly:
                         if self.M[lecturer][2] == 0:
                             self.lp[lecturer][3] = True
                             successor_index, successor_students = self.l_strict_successors(lecturer) # finds dominated students and the starting index on l_k
-                            #print(successor_index, successor_students, self.M)                         
+                            #print(successor_index, successor_students, self.M)
+                            #print(lecturer, successor_index, '\n', self.lp[lecturer][1],'\n' ,self.M[lecturer])
+#                                print(lecturer, dominated_index, dominated_students, self.G[lecturer])
+#                                for k,v in self.G.items():
+#                                    print(k, '::>', v)
+                            
                             # we delete dominated students from l_k by replacing l_k with non-dominated students
                             if successor_index != None: # otherwise, successor_index is None
                                 self.lp[lecturer][1] = self.lp[lecturer][1][:successor_index]
-                                Pk = set([i for i in self.lp[lecturer][2].keys()])  # all the projects that lecturer is offering
+                                p_k = set([i for i in self.lp[lecturer][2].keys()])  # all the projects that lecturer is offering
                                 for tie in successor_students:
                                     for st in tie:
                                         a_t = set(self.sp_no_tie_deletions[st])  # the student's altered preference list without ties..
-                                        common_projects = Pk.intersection(a_t)
+                                        common_projects = p_k.intersection(a_t)
                                         for pu in common_projects:
                                             self.delete(st, pu, lecturer)
     #                                        print('delete line 26', st, pu)
@@ -277,7 +285,9 @@ class SuperPoly:
             if self.M[student] != set() and student in self.unassigned:
                 self.unassigned.remove(student)
             # !* if the current student is unassigned in the matching, with a non-empty preference list, we re-add the student to the unassigned list
-            if self.M[student] == set() and student not in self.unassigned and len(self.sp_no_tie_deletions[student]) > 0:  #--- caught in an infinite while loop for tie-9 (check later!**)   
+            if self.M[student] == set() and student not in self.unassigned and len(self.sp_no_tie_deletions[student]) > 0:  #--- caught in an infinite while loop for tie-9 (check later!**)
+            #if self.M[student] == set() and self.sp[student][3] < self.sp[student][0]:
+                #print(student)    
                 self.unassigned.append(student)
             #########################################################################################################################################
     
@@ -449,13 +459,11 @@ class SuperPoly:
            
         return False
     
-    
     def run(self):
         
         if __name__ == '__main__':
             self.outer_repeat()
             self.check_stability()
-        
             
             if self.student_checker() or self.lecturer_checker() or self.project_checker():
                 self.found_susm = 'N'
@@ -470,9 +478,3 @@ class SuperPoly:
                         self.su_M[student] = self.M[student]
             
             return self.found_susm 
-    
-    
-    
-# filename = "instances/instance1.txt"
-# s = SuperPoly(filename)
-# print(s.run())
