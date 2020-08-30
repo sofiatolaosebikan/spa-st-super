@@ -7,7 +7,6 @@ Created on Mon Mar 16 19:44:32 2020
 """
 
 from readinput import READSPAST
-from bruteforce import SuperBruteForce
 
 
 
