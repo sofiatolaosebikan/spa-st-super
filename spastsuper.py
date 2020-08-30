@@ -476,4 +476,4 @@ class SuperPoly:
                     if self.M[student] != set():
                         self.su_M[student] = self.M[student]
             
-            return self.found_susm 
+        return self.found_susm 

@@ -165,8 +165,3 @@ class SuperBruteForce:
             
         return self.found_susm
    
-
-# filename = "CT/instance20.txt"
-# S = SuperBruteForce(filename)
-# result = S.choose(1)
-# print(result)
