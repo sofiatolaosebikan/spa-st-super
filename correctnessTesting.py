@@ -19,6 +19,6 @@ s = SuperPoly(filename)
 sa = s.run()
 b = SuperBruteForce(filename)
 ba = b.choose(1)
-print(filename + " " + sa + ba)
+print('{F} {S} {B}'.format(F=filename, S=sa, B=ba))
 
     

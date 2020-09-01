@@ -460,20 +460,20 @@ class SuperPoly:
     
     def run(self):
         
-        if __name__ == '__main__':
-            self.outer_repeat()
-            self.check_stability()
+        #if __name__ == '__main__':
+        self.outer_repeat()
+        self.check_stability()
+        
+        if self.student_checker() or self.lecturer_checker() or self.project_checker():
+            self.found_susm = 'N'
+        
+        elif self.blocking_pair is True:
+            self.found_susm = 'U'
             
-            if self.student_checker() or self.lecturer_checker() or self.project_checker():
-                self.found_susm = 'N'
-            
-            elif self.blocking_pair is True:
-                self.found_susm = 'U'
-                
-            else:
-                self.found_susm = 'Y'
-                for student in self.sp:
-                    if self.M[student] != set():
-                        self.su_M[student] = self.M[student]
-            
+        else:
+            self.found_susm = 'Y'
+            for student in self.sp:
+                if self.M[student] != set():
+                    self.su_M[student] = self.M[student]
+        
         return self.found_susm 
