@@ -40,4 +40,4 @@ This runs the ipmodel from above on a given SPA-ST instance. You need to have th
 
 > examples.ipynb
 
-We illustrate how to read the .txt file generated from a run of instanceGenerator.py.
+We illustrate how to read the .txt file generated from a run of instanceGenerator.py. We also illustrate how to run the python fles in this repo.
