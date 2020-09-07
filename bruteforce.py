@@ -7,6 +7,7 @@ Created on Sat Dec 21 23:20:17 2019
 """
 
 from readinput import READSPAST
+from copy import deepcopy
 
 
 class SuperBruteForce:
@@ -37,6 +38,7 @@ class SuperBruteForce:
         
         self.blocking_pair = False
         self.found_susm = 'N'
+        self.all_susm = []
     
     # =======================================================================    
     # blocking pair types for super-stability
@@ -124,11 +126,13 @@ class SuperBruteForce:
             self.check_stability()          
             
             if not self.blocking_pair:
-                self.found_susm = 'Y'            
+                self.found_susm = 'Y'   
+                susm = deepcopy(self.M)
+                self.all_susm.append(susm)
                 
                 # uncomment the next two lines to print a super stable matching
                 # print('A super stable matching is: ')
-                # print(self.M)
+                #print(susm)
                 # print('-------------')
          
             
@@ -163,5 +167,4 @@ class SuperBruteForce:
                     self.lp[lecturer][0] += 1
             self.choose(i+1)
             
-        return self.found_susm
-   
+        return self.found_susm, self.all_susm
